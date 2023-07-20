@@ -1,4 +1,4 @@
-mod cell;
+mod cell; //importing cell.rs code
 
 use cell::Cellule;
 use gloo::timers::callback::Interval;
@@ -6,27 +6,36 @@ use rand::Rng;
 use yew::html::Scope;
 use yew::{classes, html, Component, Context, Html};
 
+//interface of Msg, which are the buttons to help control the game
 pub enum Msg {
     Random,
     Start,
-    Step,
+    Step, //go step by step
     Reset,
     Stop,
-    ToggleCellule(usize),
-    Tick,
+    ToggleCellule(usize), //use cell.rs code to configure states of alive
+    Tick, //how fast calculations are carried out and displayed
 }
 
+//creation of grid
 pub struct App {
-    active: bool,
+    active: bool, //is the game running
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
-    _interval: Interval,
+    _interval: Interval, //how far each cell is form each other
 }
 
+//use interface
 impl App {
+
+    //randomly changes cell around
     pub fn random_mutate(&mut self) {
+
+        //goes through each pixel in a grid
         for cellule in self.cellules.iter_mut() {
+           
+            //if random generator is True (50/50)
             if rand::thread_rng().gen() {
                 cellule.set_alive();
             } else {
@@ -34,25 +43,34 @@ impl App {
             }
         }
     }
-
+    
+    //makes all the pixels white - removes the cells
     fn reset(&mut self) {
         for cellule in self.cellules.iter_mut() {
             cellule.set_dead();
         }
     }
 
+    //step by step
     fn step(&mut self) {
         let mut to_dead = Vec::new();
         let mut to_live = Vec::new();
+
+
         for row in 0..self.cellules_height {
             for col in 0..self.cellules_width {
                 let neighbors = self.neighbors(row as isize, col as isize);
 
                 let current_idx = self.row_col_as_idx(row as isize, col as isize);
+
+                //if the cell being checked is alive and if it is alone (<2 cells around) 
+                //or if the cell is overpopulated(>3 cells around
                 if self.cellules[current_idx].is_alive() {
                     if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
-                        to_dead.push(current_idx);
+                        to_dead.push(current_idx); //set the current cell to dead
                     }
+                
+                //otherwise if the number of cells around is 3 then the dead cell is alive
                 } else if Cellule::can_be_revived(&neighbors) {
                     to_live.push(current_idx);
                 }
@@ -66,6 +84,8 @@ impl App {
             .for_each(|idx| self.cellules[*idx].set_alive());
     }
 
+    //check all the surronding neibors around the cell - imagine your cell is in the center of a
+    //3x3 grid
     fn neighbors(&self, row: isize, col: isize) -> [Cellule; 8] {
         [
             self.cellules[self.row_col_as_idx(row + 1, col)],
@@ -79,13 +99,17 @@ impl App {
         ]
     }
 
+    //wrao prints each line. So for each row, print until the number of lines equivalent to height
+    //of grid
+    //vice versa for col
     fn row_col_as_idx(&self, row: isize, col: isize) -> usize {
         let row = wrap(row, self.cellules_height as isize);
         let col = wrap(col, self.cellules_width as isize);
 
-        row * self.cellules_width + col
+        row * self.cellules_width + col // the grid?
     }
 
+    //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status = {
             if cellule.is_alive() {
@@ -94,32 +118,40 @@ impl App {
                 "cellule-dead"
             }
         };
+
+        //?
         html! {
             <div key={idx} class={classes!("game-cellule", cellule_status)}
-                onclick={link.callback(move |_| Msg::ToggleCellule(idx))}>
+                onclick={link.callback(move |_| Msg::ToggleCellule(idx))}> 
             </div>
         }
     }
 }
+
+//using interface of app
 impl Component for App {
     type Message = Msg;
     type Properties = ();
-
+    
+    //creates the grid, using the function above
     fn create(ctx: &Context<Self>) -> Self {
-        let callback = ctx.link().callback(|_| Msg::Tick);
-        let interval = Interval::new(200, move || callback.emit(()));
+        let callback = ctx.link().callback(|_| Msg::Tick); //runs a callback for each tick
+        let interval = Interval::new(200, move || callback.emit(())); //200ms between each moves -- runs above line
 
-        let (cellules_width, cellules_height) = (53, 40);
+        let (cellules_width, cellules_height) = (53, 40); //grid is 53x40
 
+        //runs the board as soon as the board is open - makes every cell dead
         Self {
-            active: false,
-            cellules: vec![Cellule::new_dead(); cellules_width * cellules_height],
+            active: false, //does not start game
+            cellules: vec![Cellule::new_dead(); cellules_width * cellules_height], //everything set to dead
             cellules_width,
             cellules_height,
-            _interval: interval,
+            _interval: interval, //tick speed basically
         }
     }
 
+    //updates every 200ms
+    //buttons displayed at the bottom
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Random => {
@@ -146,6 +178,8 @@ impl Component for App {
                 log::info!("Stop");
                 false
             }
+
+            //slightly confused
             Msg::ToggleCellule(idx) => {
                 let cellule = self.cellules.get_mut(idx).unwrap();
                 cellule.toggle();
@@ -162,18 +196,19 @@ impl Component for App {
         }
     }
 
+//what displays the grid
     fn view(&self, ctx: &Context<Self>) -> Html {
         let cell_rows =
             self.cellules
                 .chunks(self.cellules_width)
-                .enumerate()
-                .map(|(y, cellules)| {
+                .enumerate() //goes through each one
+                .map(|(y, cellules)| { //mapping using y and cellules
                     let idx_offset = y * self.cellules_width;
 
                     let cells = cellules
                         .iter()
                         .enumerate()
-                        .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link()));
+                        .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link())); //map each x to grid
                     html! {
                         <div key={y} class="game-row">
                             { for cells }
@@ -213,6 +248,8 @@ impl Component for App {
 }
 
 fn wrap(coord: isize, range: isize) -> usize {
+   
+    //helps checks cells that are on the edge of the grid.
     let result = if coord < 0 {
         coord + range
     } else if coord >= range {
@@ -223,6 +260,7 @@ fn wrap(coord: isize, range: isize) -> usize {
     result as usize
 }
 
+//rendering app with wasm
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     log::trace!("Initializing yew...");
