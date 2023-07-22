@@ -1,4 +1,6 @@
 html,
+
+//title customization
 body {
   margin: 0;
   padding: 0;
@@ -8,16 +10,22 @@ body {
 body {
   font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 1.4em;
-  color: #4d4d4d;
+  //color: #4d4d4d;
+  color: #FFBF00;
+
+  //of margin I think
   min-width: 230px;
   max-width: 1000px;
   margin: 0 auto;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-weight: 300;
-  background-color: #000000;
+
+  //outside square - border colour
+  background-color: #008000;
 }
 
+//need to insert / delete
 .app-logo {
   animation: app-logo-scale infinite 4s linear;
   height: 80px;
@@ -25,40 +33,44 @@ body {
 }
 
 .app-header {
-  background-color: #000;
-  height: 130px;
-  color: aliceblue;
+  background-color: #000; //this is the margin for the game
+  height: 130px; //how large margin is
+  color: aliceblue; //colour of "Game of life text"
 }
 
+//updating the text
 .app-title {
   font-size: 24px;
   width: 100%;
   font-weight: 100;
-  text-align: center;
+  text-align: center; 
   -webkit-text-rendering: optimizeLegibility;
   -moz-text-rendering: optimizeLegibility;
   text-rendering: optimizeLegibility;
 }
 
+//no clue
 .app-footer {
-  background-color: #000000;
+  background-color: #000000; //no clue what this is for
   height: 30px;
   padding: 10px;
 }
 
+//no clue
 .footer-text {
-  color: aliceblue;
+  color: red;
   padding-left: 20px;
   font-size: 14px;
 }
 
+//the grid
 .game-area {
   width: 94%;
   margin: 20px auto;
 }
 
 .game-container {
-  background: #000000;
+  background: #FFBF00;
   margin: 20px 0 0px 0;
 }
 
