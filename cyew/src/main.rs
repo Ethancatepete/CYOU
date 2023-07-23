@@ -220,13 +220,15 @@ impl Component for App {
             <div>
                 <section class="game-container">
                     <header class="app-header">
-                        <img alt="The app logo" src="favicon.ico" class="app-logo"/>
+                       // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
                         <h1 class="app-title">{ "Game of Life" }</h1>
                     </header>
                     <section class="game-area">
+
                         <div class="game-of-life">
                             { for cell_rows }
                         </div>
+
                         <div class="game-buttons">
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
@@ -236,12 +238,14 @@ impl Component for App {
                         </div>
                     </section>
                 </section>
+                /*
                 <footer class="app-footer">
                     <strong class="footer-text">
                       { "Game of Life - a yew experiment " }
                     </strong>
                     <a href="https://github.com/yewstack/yew" target="_blank">{ "source" }</a>
                 </footer>
+                */
             </div>
         }
     }
