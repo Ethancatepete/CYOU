@@ -22,7 +22,7 @@ body {
   font-weight: 300;
 
   //outside square - border colour
-  background-color: #008000;
+  background-color: #1f1f1f;
 }
 
 //need to insert / delete
@@ -33,14 +33,15 @@ body {
 }
 
 .app-header {
-  background-color: #FFA500; //this is the margin for the game
+  background-color: #1f1f1f; //this is the margin for the game
   height: 80px; //how large margin is
   color: aliceblue; //colour of "Game of life text"
+  padding: 20px;
 }
 
 //updating the text
 .app-title {
-  font-size: 24px;
+  font-size: 48px;
   width: 100%;
   font-weight: 100;
   text-align: center; 
@@ -67,15 +68,14 @@ body {
 
 //the grid AND the buttons
 .game-area {
-
-  width: 94%;
+  width: 100%;
   margin: 20px auto;
 }
 
 //the square surronding the grid
 .game-container {
   position: static;
-  background: #000000;
+  background: #1f1f1f;
   margin: 20px 0 0px 0;
 }
 
@@ -93,22 +93,38 @@ body {
 
 .game-cellule {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  border: 1px solid #ccc;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #cccccc55;
 }
 
 .cellule-dead {
-  background-color: white;
+  background-color: #2f2f2f;
 }
 
 .cellule-live {
-  background-color: black;
+  background-color: #f2f2f2;
 }
 
 .game-buttons {
   width: 100%;
-  margin-top: 20px;
+}
+
+button {
+  background-color: #3f3f3f; /* Green */
+  transition-duration: 0.2s;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
 }
 
 /*
