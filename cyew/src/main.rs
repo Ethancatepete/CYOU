@@ -37,9 +37,9 @@ impl App {
            
             //if random generator is True (50/50)
             if rand::thread_rng().gen() {
-                cellule.set_alive();
+                cellule.set_state(cell::State::A("alive")); //set the cell to alive
             } else {
-                cellule.set_dead();
+                cellule.set_state(cell::State::B("dead")); //otherwise set it to dead
             }
         }
     }
@@ -47,41 +47,42 @@ impl App {
     //makes all the pixels white - removes the cells
     fn reset(&mut self) {
         for cellule in self.cellules.iter_mut() {
-            cellule.set_dead();
+            cellule.set_state(cell::State::A("dead"));
         }
     }
 
     //step by step
     fn step(&mut self) {
-        let mut to_dead = Vec::new();
-        let mut to_live = Vec::new();
+        // edit step settings
+        // let mut to_dead = Vec::new();
+        // let mut to_live = Vec::new();
 
 
-        for row in 0..self.cellules_height {
-            for col in 0..self.cellules_width {
-                let neighbors = self.neighbors(row as isize, col as isize);
+        // for row in 0..self.cellules_height {
+        //     for col in 0..self.cellules_width {
+        //         let neighbors = self.neighbors(row as isize, col as isize);
 
-                let current_idx = self.row_col_as_idx(row as isize, col as isize);
+        //         let current_idx = self.row_col_as_idx(row as isize, col as isize);
 
-                //if the cell being checked is alive and if it is alone (<2 cells around) 
-                //or if the cell is overpopulated(>3 cells around
-                if self.cellules[current_idx].is_alive() {
-                    if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
-                        to_dead.push(current_idx); //set the current cell to dead
-                    }
+        //         //if the cell being checked is alive and if it is alone (<2 cells around) 
+        //         //or if the cell is overpopulated(>3 cells around
+        //         if self.cellules[current_idx].is_alive() {
+        //             if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
+        //                 to_dead.push(current_idx); //set the current cell to dead
+        //             }
                 
-                //otherwise if the number of cells around is 3 then the dead cell is alive
-                } else if Cellule::can_be_revived(&neighbors) {
-                    to_live.push(current_idx);
-                }
-            }
-        }
-        to_dead
-            .iter()
-            .for_each(|idx| self.cellules[*idx].set_dead());
-        to_live
-            .iter()
-            .for_each(|idx| self.cellules[*idx].set_alive());
+        //         //otherwise if the number of cells around is 3 then the dead cell is alive
+        //         } else if Cellule::can_be_revived(&neighbors) {
+        //             to_live.push(current_idx);
+        //         }
+        //     }
+        // }
+        // to_dead
+        //     .iter()
+        //     .for_each(|idx| self.cellules[*idx].set_dead());
+        // to_live
+        //     .iter()
+        //     .for_each(|idx| self.cellules[*idx].set_alive());
     }
 
     //check all the surronding neibors around the cell - imagine your cell is in the center of a
@@ -111,11 +112,24 @@ impl App {
 
     //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
-        let cellule_status = {
-            if cellule.is_alive() {
-                "cellule-live"
-            } else {
-                "cellule-dead"
+        let cellule_status: String = {
+            match cellule.state {
+                cell::State::A(_) => "your mom".to_string(),
+                cell::State::B(_) => todo!(), // ill finish this later itll prob just be colors anyways, might make it dynamically programmable
+                cell::State::C(_) => todo!(),
+                cell::State::D(_) => todo!(),
+                cell::State::E(_) => todo!(),
+                cell::State::F(_) => todo!(),
+                cell::State::G(_) => todo!(),
+                cell::State::H(_) => todo!(),
+                cell::State::I(_) => todo!(),
+                cell::State::J(_) => todo!(),
+                cell::State::K(_) => todo!(),
+                cell::State::L(_) => todo!(),
+                cell::State::M(_) => todo!(),
+                cell::State::N(_) => todo!(),
+                cell::State::O(_) => todo!(),
+                cell::State::P(_) => todo!(),
             }
         };
 
@@ -143,7 +157,7 @@ impl Component for App {
         //runs the board as soon as the board is open - makes every cell dead
         Self {
             active: false, //does not start game
-            cellules: vec![Cellule::new_dead(); cellules_width * cellules_height], //everything set to dead
+            cellules: vec![Cellule::new(cell::State::A("dead")); cellules_width * cellules_height], //everything set to dead
             cellules_width,
             cellules_height,
             _interval: interval, //tick speed basically
@@ -179,12 +193,13 @@ impl Component for App {
                 false
             }
 
-            //slightly confused
+            //this is the function that happens when u click on a tile. (the wasm msg that sedss)
             Msg::ToggleCellule(idx) => {
                 let cellule = self.cellules.get_mut(idx).unwrap();
-                cellule.toggle();
+                // cellule.toggle(); fuck u no toggle function yet
                 true
             }
+
             Msg::Tick => {
                 if self.active {
                     self.step();
