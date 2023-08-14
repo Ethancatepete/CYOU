@@ -34,14 +34,14 @@ body {
 
 .app-header {
   background-color: #1f1f1f; //this is the margin for the game
-  height: 80px; //how large margin is
+  height: 40px; //how large margin is
   color: aliceblue; //colour of "Game of life text"
   padding: 20px;
 }
 
 //updating the text
 .app-title {
-  font-size: 48px;
+  font-size: 35px;
   width: 100%;
   font-weight: 100;
   text-align: center; 
@@ -66,17 +66,53 @@ body {
 }
 */
 
+//split game-area
+//split control
+
+.split {
+  height: 90%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden; //need to reduce siae of x
+  padding-top:10px;
+}
+
+
+
 //the grid AND the buttons
 .game-area {
-  width: 100%;
-  margin: 20px auto;
+  width: 80%;
+  margin: 10px auto;
 }
 
 //the square surronding the grid
+//split screen to the left
 .game-container {
-  position: static;
+  left: 0;
   background: #1f1f1f;
-  margin: 20px 0 0px 0;
+  margin: 10px 0 0px 0;
+}
+
+//right side
+//h3.text
+.right {
+  right: 0;
+  //background: red;
+}
+
+div.txt {
+  display: flex;
+  //background-color: blue;
+  overflow-x: hidden;
+  
+  //Horizontal
+  justify-content: left;
+  
+  //vertical
+  align-items: center;
+
 }
 
 //modify this area in order to move the grid
@@ -88,13 +124,13 @@ body {
 }
 
 .game-row {
-  line-height: 0;
+  line-height: 0; // how far rows are from each other -dont touch
 }
 
 .game-cellule {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 8px;
+  height: 8px;
   border: 1px solid #cccccc55;
 }
 
@@ -126,6 +162,11 @@ button:hover {
   background-color: #4CAF50; /* Green */
   color: white;
 }
+
+
+
+
+
 
 /*
 @keyframes app-logo-scale {

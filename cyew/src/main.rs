@@ -232,7 +232,7 @@ impl Component for App {
                 });
 
         html! {
-            <div>
+               /*
                 <section class="game-container">
                     <header class="app-header">
                        // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
@@ -261,7 +261,51 @@ impl Component for App {
                     <a href="https://github.com/yewstack/yew" target="_blank">{ "source" }</a>
                 </footer>
                 */
+                */
+
+                
+            <div>
+                //this will be on the left side
+                <div class="split game-container">
+                    <header class="app-header">
+                       // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
+                        <h1 class="app-title">{ "Game of Life" }</h1>
+                    </header>
+                    <div class="game-area">
+
+                        <div class="game-of-life">
+                            { for cell_rows }
+                        </div>
+
+                        <div class="game-buttons">
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Start)}>{ "Start" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
+                        </div>
+                    </div>
+                </div>
+            
+
+                <div class = "split right">
+                    <div class = "txt">
+                        <h3>{"Dead cells"}</h3>
+                        <h3>{"Alive cells"}</h3>
+                        <h3>{"Spawn limit"}</h3>
+                        <h3>{"Revive"}</h3>
+                    </div>
+                </div>
+
             </div>
+                /*
+                <footer class="app-footer">
+                    <strong class="footer-text">
+                      { "Game of Life - a yew experiment " }
+                    </strong>
+                    <a href="https://github.com/yewstack/yew" target="_blank">{ "source" }</a>
+                </footer>
+                */
         }
     }
 }
