@@ -102,18 +102,6 @@ body {
   //background: red;
 }
 
-div.txt {
-  display: flex;
-  //background-color: blue;
-  overflow-x: hidden;
-  
-  //Horizontal
-  justify-content: left;
-  
-  //vertical
-  align-items: center;
-
-}
 
 //modify this area in order to move the grid
 .game-of-life {
@@ -163,9 +151,30 @@ button:hover {
   color: white;
 }
 
+.box {
+  display: flex;
+  height: 150px;
+  flex-direction: row;
+  justify-content: center;
+  align-content: space-between;
+  align-items: end;
+}
 
+.box > div {
+  background-color: #3f3f3f; /* Gray */
+  color: white;
+  margin: 10px;
+  text-align: center;
+  font-size: 60px;
+  border: 30px solid #3f3f3f;
+}
 
-
+.txt {
+  font-size: 25px;
+  text-align: center;
+  margin: 70px;
+  border: 2px solid #4CAF50;
+}
 
 
 /*

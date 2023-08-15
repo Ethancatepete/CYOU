@@ -290,11 +290,19 @@ impl Component for App {
 
                 <div class = "split right">
                     <div class = "txt">
-                        <h3>{"Dead cells"}</h3>
-                        <h3>{"Alive cells"}</h3>
-                        <h3>{"Spawn limit"}</h3>
-                        <h3>{"Revive"}</h3>
+                        <h3>{"Dead cells: "}</h3>
+                        <h3>{"Alive cells: "}</h3>
+                        <h3>{"Spawn limit: "}</h3>
+                        <h3>{"Revive: "}</h3>
                     </div>
+
+                    <div class = "box">
+                        <div>{"<"}</div>
+                        <div>{"Counter"}</div>
+                        <div>{">"}</div>
+                    </div>
+
+
                 </div>
 
             </div>
