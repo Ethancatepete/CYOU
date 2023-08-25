@@ -131,11 +131,11 @@ body {
 }
 
 .game-buttons {
-  width: 100%;
+  width: 100%
 }
 
 button {
-  background-color: #3f3f3f; /* Green */
+  background-color: #3f3f3f; 
   transition-duration: 0.2s;
   border: none;
   color: white;
@@ -160,7 +160,9 @@ button:hover {
   align-items: end;
 }
 
+//
 .box > div {
+  transition-duration: 0.2s;
   background-color: #3f3f3f; /* Gray */
   color: white;
   margin: 10px;
@@ -169,12 +171,40 @@ button:hover {
   border: 30px solid #3f3f3f;
 }
 
+.menu:hover{	
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+
 .txt {
+  transition-duration: 0.2s;
   font-size: 25px;
   text-align: center;
   margin: 70px;
   border: 2px solid #4CAF50;
 }
+
+#h3_1:hover {
+  transition-duration: 0.2s;
+  color: green;
+}
+
+#h3_2:hover {
+  transition-duration: 0.2s;
+  color: green;
+}
+
+#h3_3:hover {
+  transition-duration: 0.2s;
+  color: green;
+}
+
+#h3_4:hover {
+  transition-duration: 0.2s;
+  color: green;
+}
+	
 
 
 /*
