@@ -41,6 +41,28 @@ impl State {
             State::P => "P".to_string(),
         }
     }
+
+    pub fn from_string(character: &str) -> Result<Self, String> {
+        match character {
+            "A" => State::A,
+            "B" => State::B,
+            "C" => State::C,
+            "D" => State::D,
+            "E" => State::E,
+            "F" => State::F,
+            "G" => State::G,
+            "H" => State::H,
+            "I" => State::I,
+            "J" => State::J,
+            "K" => State::K,
+            "L" => State::L,
+            "M" => State::M,
+            "N" => State::N,
+            "O" => State::O,
+            "P" => State::P,
+            _ => State::A,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]

@@ -13,6 +13,7 @@ pub enum Msg {
     Step, //go step by step
     Reset,
     Stop,
+    SetState(String),
     ToggleCellule(usize), //use cell.rs code to configure states of alive
     Tick,                 //how fast calculations are carried out and displayed
 }
@@ -198,6 +199,17 @@ impl Component for App {
                     true
                 } else {
                     false
+                }
+            }
+
+            Msg::SetState(state) => {
+                let state = State::from_string(&state);
+                match state {
+                    Ok(state) => {
+                        self.selected_state = state;
+                        true
+                    }
+                    Err(_) => false,
                 }
             }
         }
