@@ -1,6 +1,6 @@
 mod cell; //importing cell.rs code
 
-use cell::Cellule;
+use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
 use rand::Rng;
 use yew::html::Scope;
@@ -14,12 +14,14 @@ pub enum Msg {
     Reset,
     Stop,
     ToggleCellule(usize), //use cell.rs code to configure states of alive
-    Tick, //how fast calculations are carried out and displayed
+    Tick,                 //how fast calculations are carried out and displayed
 }
 
 //creation of grid
 pub struct App {
-    active: bool, //is the game running
+    active: bool,          // is the game running
+    selected_state: State, // what state is selected, must be a state in cell_states
+    cell_states: Vec<State>,
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
@@ -28,26 +30,34 @@ pub struct App {
 
 //use interface
 impl App {
+    pub fn toggle_state(&mut self, state: State) -> Result<(), String> {
+        if state == State::A || state == State::B {
+            return Err("Cannot toggle blank state".to_string());
+        }
 
-    //randomly changes cell around
-    pub fn random_mutate(&mut self) {
-
-        //goes through each pixel in a grid
-        for cellule in self.cellules.iter_mut() {
-           
-            //if random generator is True (50/50)
-            if rand::thread_rng().gen() {
-                cellule.set_state(cell::State::A("alive")); //set the cell to alive
-            } else {
-                cellule.set_state(cell::State::B("dead")); //otherwise set it to dead
-            }
+        if self.cell_states.contains(&state) {
+            self.cell_states.retain(|s| *s != state);
+            return Ok(());
+        } else {
+            self.cell_states.push(state);
+            return Ok(());
         }
     }
-    
+
+    pub fn random_mutate(&mut self) {
+        //goes through each pixel in a grid
+        for cellule in self.cellules.iter_mut() {
+            // Switch state to a randomly available state in the cell states
+            let states = self.cell_states.len();
+            let random_state = self.cell_states[rand::thread_rng().gen_range(0..states)];
+            cellule.set_state(random_state);
+        }
+    }
+
     //makes all the pixels white - removes the cells
     fn reset(&mut self) {
         for cellule in self.cellules.iter_mut() {
-            cellule.set_state(cell::State::A("dead"));
+            cellule.set_blank();
         }
     }
 
@@ -57,20 +67,19 @@ impl App {
         // let mut to_dead = Vec::new();
         // let mut to_live = Vec::new();
 
-
         // for row in 0..self.cellules_height {
         //     for col in 0..self.cellules_width {
         //         let neighbors = self.neighbors(row as isize, col as isize);
 
         //         let current_idx = self.row_col_as_idx(row as isize, col as isize);
 
-        //         //if the cell being checked is alive and if it is alone (<2 cells around) 
+        //         //if the cell being checked is alive and if it is alone (<2 cells around)
         //         //or if the cell is overpopulated(>3 cells around
         //         if self.cellules[current_idx].is_alive() {
         //             if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
         //                 to_dead.push(current_idx); //set the current cell to dead
         //             }
-                
+
         //         //otherwise if the number of cells around is 3 then the dead cell is alive
         //         } else if Cellule::can_be_revived(&neighbors) {
         //             to_live.push(current_idx);
@@ -112,31 +121,12 @@ impl App {
 
     //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
-        let cellule_status: String = {
-            match cellule.state {
-                cell::State::A(_) => "your mom".to_string(),
-                cell::State::B(_) => todo!(), // ill finish this later itll prob just be colors anyways, might make it dynamically programmable
-                cell::State::C(_) => todo!(),
-                cell::State::D(_) => todo!(),
-                cell::State::E(_) => todo!(),
-                cell::State::F(_) => todo!(),
-                cell::State::G(_) => todo!(),
-                cell::State::H(_) => todo!(),
-                cell::State::I(_) => todo!(),
-                cell::State::J(_) => todo!(),
-                cell::State::K(_) => todo!(),
-                cell::State::L(_) => todo!(),
-                cell::State::M(_) => todo!(),
-                cell::State::N(_) => todo!(),
-                cell::State::O(_) => todo!(),
-                cell::State::P(_) => todo!(),
-            }
-        };
+        let cellule_status: String = cellule.state.to_string();
 
         //?
         html! {
             <div key={idx} class={classes!("game-cellule", cellule_status)}
-                onclick={link.callback(move |_| Msg::ToggleCellule(idx))}> 
+                onclick={link.callback(move |_| Msg::ToggleCellule(idx))}>
             </div>
         }
     }
@@ -146,18 +136,20 @@ impl App {
 impl Component for App {
     type Message = Msg;
     type Properties = ();
-    
+
     //creates the grid, using the function above
     fn create(ctx: &Context<Self>) -> Self {
         let callback = ctx.link().callback(|_| Msg::Tick); //runs a callback for each tick
         let interval = Interval::new(200, move || callback.emit(())); //200ms between each moves -- runs above line
 
-        let (cellules_width, cellules_height) = (53, 40); //grid is 53x40
+        let (cellules_width, cellules_height) = (60, 40); //grid is 53x40
 
         //runs the board as soon as the board is open - makes every cell dead
         Self {
-            active: false, //does not start game
-            cellules: vec![Cellule::new(cell::State::A("dead")); cellules_width * cellules_height], //everything set to dead
+            active: false,            //does not start game
+            selected_state: State::B, //default state
+            cellules: vec![Cellule::new(cell::State::A); cellules_width * cellules_height], //everything set to dead
+            cell_states: vec![State::A, State::B, State::C, State::D, State::E], //5 enabled states by default
             cellules_width,
             cellules_height,
             _interval: interval, //tick speed basically
@@ -196,7 +188,7 @@ impl Component for App {
             //this is the function that happens when u click on a tile. (the wasm msg that sedss)
             Msg::ToggleCellule(idx) => {
                 let cellule = self.cellules.get_mut(idx).unwrap();
-                // cellule.toggle(); fuck u no toggle function yet
+                cellule.toggle_cell(self.selected_state);
                 true
             }
 
@@ -211,25 +203,26 @@ impl Component for App {
         }
     }
 
-//what displays the grid
+    //what displays the grid
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let cell_rows =
-            self.cellules
-                .chunks(self.cellules_width)
-                .enumerate() //goes through each one
-                .map(|(y, cellules)| { //mapping using y and cellules
-                    let idx_offset = y * self.cellules_width;
+        let cell_rows = self
+            .cellules
+            .chunks(self.cellules_width)
+            .enumerate() //goes through each one
+            .map(|(y, cellules)| {
+                //mapping using y and cellules
+                let idx_offset = y * self.cellules_width;
 
-                    let cells = cellules
-                        .iter()
-                        .enumerate()
-                        .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link())); //map each x to grid
-                    html! {
-                        <div key={y} class="game-row">
-                            { for cells }
-                        </div>
-                    }
-                });
+                let cells = cellules
+                    .iter()
+                    .enumerate()
+                    .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link())); //map each x to grid
+                html! {
+                    <div key={y} class="game-row">
+                        { for cells }
+                    </div>
+                }
+            });
 
         html! {
                /*
@@ -263,7 +256,7 @@ impl Component for App {
                 */
                 */
 
-                
+
             <div>
                 //this will be on the left side
                 <div class="split game-container">
@@ -286,7 +279,7 @@ impl Component for App {
                         </div>
                     </div>
                 </div>
-            
+
 
                 <div class = "split right">
                     <div class = "txt">
@@ -319,7 +312,6 @@ impl Component for App {
 }
 
 fn wrap(coord: isize, range: isize) -> usize {
-   
     //helps checks cells that are on the edge of the grid.
     let result = if coord < 0 {
         coord + range
