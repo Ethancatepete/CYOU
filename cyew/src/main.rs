@@ -2,45 +2,48 @@ mod cell; //importing cell.rs code
 
 use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
-use rand::Rng;
+use rand::seq::IteratorRandom;
+use rhai::{Engine, EvalAltResult};
+use std::collections::HashMap;
 use yew::html::Scope;
 use yew::{classes, html, Component, Context, Html};
 
-//interface of Msg, which are the buttons to help control the game
 pub enum Msg {
     Random,
     Start,
     Step, //go step by step
     Reset,
     Stop,
-    SetState(String),
-    ToggleCellule(usize), //use cell.rs code to configure states of alive
-    Tick,                 //how fast calculations are carried out and displayed
+    Conditions(String), // Name of condition as a rhai script
+    SetState(char),     // change state of
+    ToggleCellule(usize),
+    Tick, // game update tick
 }
 
 //creation of grid
 pub struct App {
     active: bool,          // is the game running
     selected_state: State, // what state is selected, must be a state in cell_states
-    cell_states: Vec<State>,
+    cell_states: HashMap<State, String>,
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
+    engine: Engine,
     _interval: Interval, //how far each cell is form each other
 }
 
 //use interface
 impl App {
     pub fn toggle_state(&mut self, state: State) -> Result<(), String> {
-        if state == State::A || state == State::B {
-            return Err("Cannot toggle blank state".to_string());
+        if state == 'A' || state == 'B' {
+            return Err("Cannot toggle these state".to_string());
         }
 
-        if self.cell_states.contains(&state) {
-            self.cell_states.retain(|s| *s != state);
+        if self.cell_states.contains_key(&state) {
+            self.cell_states.remove(&state);
             return Ok(());
         } else {
-            self.cell_states.push(state);
+            self.cell_states.insert(state, state.to_string());
             return Ok(());
         }
     }
@@ -50,8 +53,12 @@ impl App {
         for cellule in self.cellules.iter_mut() {
             // Switch state to a randomly available state in the cell states
             let states = self.cell_states.len();
-            let random_state = self.cell_states[rand::thread_rng().gen_range(0..states)];
-            cellule.set_state(random_state);
+            let random_state = self
+                .cell_states
+                .keys()
+                .choose(&mut rand::thread_rng())
+                .unwrap();
+            cellule.set_state(*random_state);
         }
     }
 
@@ -64,67 +71,29 @@ impl App {
 
     //step by step
     fn step(&mut self) {
-        // edit step settings
-        // let mut to_dead = Vec::new();
-        // let mut to_live = Vec::new();
+        let mut new_cellules = self.cellules.clone();
 
-        // for row in 0..self.cellules_height {
-        //     for col in 0..self.cellules_width {
-        //         let neighbors = self.neighbors(row as isize, col as isize);
+        //goes through each cell
+        for (idx, cellule) in self.cellules.iter().enumerate() {
+            let result = self.engine.eval::<State>(&self.cell_states[&cellule.state]);
+            match result {
+                Ok(state) => {
+                    new_cellules[idx].set_state(state);
+                }
+                Err(err) => {
+                    if let EvalAltResult::ErrorRuntime(err, _) = *err {
+                        log::error!("Error: {}", err);
+                    }
+                }
+            }
+        }
 
-        //         let current_idx = self.row_col_as_idx(row as isize, col as isize);
-
-        //         //if the cell being checked is alive and if it is alone (<2 cells around)
-        //         //or if the cell is overpopulated(>3 cells around
-        //         if self.cellules[current_idx].is_alive() {
-        //             if Cellule::alone(&neighbors) || Cellule::overpopulated(&neighbors) {
-        //                 to_dead.push(current_idx); //set the current cell to dead
-        //             }
-
-        //         //otherwise if the number of cells around is 3 then the dead cell is alive
-        //         } else if Cellule::can_be_revived(&neighbors) {
-        //             to_live.push(current_idx);
-        //         }
-        //     }
-        // }
-        // to_dead
-        //     .iter()
-        //     .for_each(|idx| self.cellules[*idx].set_dead());
-        // to_live
-        //     .iter()
-        //     .for_each(|idx| self.cellules[*idx].set_alive());
-    }
-
-    //check all the surronding neibors around the cell - imagine your cell is in the center of a
-    //3x3 grid
-    fn neighbors(&self, row: isize, col: isize) -> [Cellule; 8] {
-        [
-            self.cellules[self.row_col_as_idx(row + 1, col)],
-            self.cellules[self.row_col_as_idx(row + 1, col + 1)],
-            self.cellules[self.row_col_as_idx(row + 1, col - 1)],
-            self.cellules[self.row_col_as_idx(row - 1, col)],
-            self.cellules[self.row_col_as_idx(row - 1, col + 1)],
-            self.cellules[self.row_col_as_idx(row - 1, col - 1)],
-            self.cellules[self.row_col_as_idx(row, col - 1)],
-            self.cellules[self.row_col_as_idx(row, col + 1)],
-        ]
-    }
-
-    //wrao prints each line. So for each row, print until the number of lines equivalent to height
-    //of grid
-    //vice versa for col
-    fn row_col_as_idx(&self, row: isize, col: isize) -> usize {
-        let row = wrap(row, self.cellules_height as isize);
-        let col = wrap(col, self.cellules_width as isize);
-
-        row * self.cellules_width + col // the grid?
+        self.cellules = new_cellules;
     }
 
     //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
-
-        //?
         html! {
             <div key={idx} class={classes!("game-cellule", cellule_status)}
                 onclick={link.callback(move |_| Msg::ToggleCellule(idx))}>
@@ -133,7 +102,6 @@ impl App {
     }
 }
 
-//using interface of app
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -147,12 +115,19 @@ impl Component for App {
 
         //runs the board as soon as the board is open - makes every cell dead
         Self {
-            active: false,            //does not start game
-            selected_state: State::B, //default state
-            cellules: vec![Cellule::new(cell::State::A); cellules_width * cellules_height], //everything set to dead
-            cell_states: vec![State::A, State::B, State::C, State::D, State::E], //5 enabled states by default
+            active: false,       //does not start game
+            selected_state: 'B', //default state
+            cellules: vec![Cellule::new('A'); cellules_width * cellules_height], //everything set to dead
+            cell_states: HashMap::from([
+                ('A', "A".to_string()),
+                ('B', "B".to_string()),
+                ('C', "C".to_string()),
+                ('D', "D".to_string()),
+                ('E', "E".to_string()),
+            ]), //5 enabled states by default
             cellules_width,
             cellules_height,
+            engine: Engine::new(),
             _interval: interval, //tick speed basically
         }
     }
@@ -203,13 +178,24 @@ impl Component for App {
             }
 
             Msg::SetState(state) => {
-                let state = State::from_string(&state);
-                match state {
-                    Ok(state) => {
-                        self.selected_state = state;
-                        true
-                    }
-                    Err(_) => false,
+                if self.cell_states.contains_key(&state) {
+                    self.selected_state = state;
+                    true
+                } else {
+                    log::error!("Invalid state: {}", state);
+                    false
+                }
+            }
+
+            Msg::Conditions(condition) => {
+                let state = self.selected_state;
+                // update the string in the hashmap
+                if self.cell_states.contains_key(&state) {
+                    self.cell_states.insert(state, condition);
+                    true
+                } else {
+                    log::error!("Invalid selected state: {}", state);
+                    false
                 }
             }
         }
@@ -309,7 +295,7 @@ impl Component for App {
                         <div class = "menu">{">"}</div>
                         //need to replace the arrow with the randomiser script
                         //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: right changer)}>{">"}</button>
-            
+
                     </div>
 
 
@@ -326,18 +312,6 @@ impl Component for App {
                 */
         }
     }
-}
-
-fn wrap(coord: isize, range: isize) -> usize {
-    //helps checks cells that are on the edge of the grid.
-    let result = if coord < 0 {
-        coord + range
-    } else if coord >= range {
-        coord - range
-    } else {
-        coord
-    };
-    result as usize
 }
 
 //rendering app with wasm
