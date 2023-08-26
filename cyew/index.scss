@@ -8,7 +8,7 @@ body {
 }
 
 body {
-  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 14px "Raleway", Helvetica, Arial, sans-serif;
   line-height: 1.4em;
   //color: #4d4d4d;
   color: #FFBF00;
@@ -42,6 +42,7 @@ body {
 //updating the text
 .app-title {
   font-size: 35px;
+  font-family: "Raleway", sans-serif;
   width: 100%;
   font-weight: 100;
   text-align: center; 
@@ -236,6 +237,7 @@ button:hover {
 .txt {
   transition-duration: 0.2s;
   font-size: 25px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
   text-align: center;
   margin: 70px;
   border: 2px solid #4CAF50;
@@ -244,21 +246,25 @@ button:hover {
 #h3_1:hover {
   transition-duration: 0.2s;
   color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
 
 #h3_2:hover {
   transition-duration: 0.2s;
   color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
 
 #h3_3:hover {
   transition-duration: 0.2s;
   color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
 
 #h3_4:hover {
   transition-duration: 0.2s;
   color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
 	
 
