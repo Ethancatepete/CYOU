@@ -290,16 +290,21 @@ impl Component for App {
 
                 <div class = "split right">
                     <div class = "txt">
-                        <h3>{"Dead cells: "}</h3>
-                        <h3>{"Alive cells: "}</h3>
-                        <h3>{"Spawn limit: "}</h3>
-                        <h3>{"Revive: "}</h3>
+                        <h3 id="h3_1">{"Dead cells: "}</h3>
+                        <h3 id ="h3_2">{"Alive cells: "}</h3>
+                        <h3 id ="h3_3">{"Spawn limit: "}</h3>
+                        <h3 id ="h3_4">{"Revive: "}</h3>
                     </div>
 
                     <div class = "box">
-                        <div>{"<"}</div>
+                        //need to replace
+                        //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: left changer)}>{"<"}</button>
+                        <div class = "menu">{"<"}</div>
                         <div>{"Counter"}</div>
-                        <div>{">"}</div>
+                        <div class = "menu">{">"}</div>
+                        //need to replace the arrow with the randomiser script
+                        //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: right changer)}>{">"}</button>
+            
                     </div>
 
 
