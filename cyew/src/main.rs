@@ -274,7 +274,7 @@ impl Component for App {
                 <div class="split game-container">
                     <header class="app-header">
                        // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
-                        <h1 class="app-title">{ "Game of Life" }</h1>
+                        <h1 class="app-title">{ "Cellular Automata" }</h1>
                     </header>
                     <div class="game-area">
 
