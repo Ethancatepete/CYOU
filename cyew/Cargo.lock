@@ -146,9 +146,11 @@ version = "0.1.0"
 dependencies = [
  "getrandom",
  "gloo",
+ "js-sys",
  "log",
  "rand",
  "rhai",
+ "wasm-bindgen",
  "wasm-logger",
  "yew",
 ]
@@ -479,6 +481,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if",
+ "js-sys",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -725,6 +730,7 @@ checksum = "4c2a11a646ef5d4e4a9d5cf80c7e4ecb20f9b1954292d5c5e6d6cbc8d33728ec"
 dependencies = [
  "ahash",
  "bitflags",
+ "getrandom",
  "instant",
  "num-traits",
  "rhai_codegen",
@@ -977,6 +983,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7706a72ab36d8cb1f80ffbf0e071533974a60d0a308d01a5d0375bf60499a342"
 dependencies = [
  "cfg-if",
+ "serde",
+ "serde_json",
  "wasm-bindgen-macro",
 ]
 

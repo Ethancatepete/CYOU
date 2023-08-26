@@ -52,7 +52,6 @@ impl App {
         //goes through each pixel in a grid
         for cellule in self.cellules.iter_mut() {
             // Switch state to a randomly available state in the cell states
-            let states = self.cell_states.len();
             let random_state = self
                 .cell_states
                 .keys()
