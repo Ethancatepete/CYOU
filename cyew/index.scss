@@ -234,16 +234,15 @@ button:hover {
 }
 
 
-form {
+.txt {
   transition-duration: 0.2s;
   font-size: 25px;
   font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-  text-align: center;
   margin: 70px;
   border: 2px solid #4CAF50;
+  height: 75%;
 }
 
-/*
 #h3_1:hover {
   transition-duration: 0.2s;
   color: green;
@@ -267,39 +266,7 @@ form {
   color: green;
   font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
-*/
 
-label {
-  display:block;
+.full-height {
+  height: 75%;
 }
-
-input[type="text"],
-textarea{
-  width: 100%;
-  padding: 5px;
-}
-
-input[type="submit"] {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor:pointer;
-}
-
-
-
-
-
-
-
-/*
-@keyframes app-logo-scale {
-  from {
-    transform: scale(0.8);
-  }
-  to {
-    transform: scale(1.2);
-  }
-}
-*/

@@ -14,7 +14,11 @@ getrandom = { version = "0.2", features = ["js"] }
 log = "0.4"
 rand = "0.8"
 wasm-logger = "0.2"
-gloo = "0.8"
+gloo = "*"
 rhai = { version = "*", features = ["only_i64","internals","wasm-bindgen"] }
 wasm-bindgen = { version = "0.2.45", features = ["serde-serialize"] }
 js-sys = "0.3"
+monaco = { git = "https://github.com/siku2/rust-monaco", features = ["yew-components"] }
+web-sys = { version = "*", features = ["HtmlCollection"] }
+wasm-bindgen-futures = "*"
+split-yew = "0.1.1"

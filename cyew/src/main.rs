@@ -2,15 +2,22 @@ mod cell; //importing cell.rs code
 
 use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
-use rand::seq::IteratorRandom;
+use monaco::{api::CodeEditorOptions, sys::editor::BuiltinTheme, yew::CodeEditor};
+use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
-use yew::html::Scope;
-use yew::{classes, html, Component, Context, Html};
-use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlFormElement, FormData};
-use gloo_console::debug;
+use std::rc::Rc;
+use yew::{classes, html, html::Scope, Component, Context, Html};
 
+const CONTENT: &str = include_str!("main.rs");
+
+fn get_options() -> CodeEditorOptions {
+    CodeEditorOptions::default()
+        .with_language("rust".to_owned())
+        .with_value(CONTENT.to_owned())
+        .with_builtin_theme(BuiltinTheme::VsDark)
+        .with_automatic_layout(true)
+}
 
 pub enum Msg {
     Random,
@@ -33,28 +40,9 @@ pub struct App {
     cellules_width: usize,
     cellules_height: usize,
     engine: Engine,
-    _interval: Interval, //how far each cell is form each other
+    _interval: Interval, //how far each cell is from each other
+    options: Rc<CodeEditorOptions>,
 }
-
-const form_onsubmit {
-	Callback::from(move |event: SubmitEvent| {
-		let target: Option<EventTarget> = event.target();
-		debug!(target.clone());
-		let form = target.and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
-		debug!(form.clone());
-
-		if let Some(form) = form {
-			let form_data = FormData::new_with_form(&form);
-			debug!(form_data.expect("Form data"));
-		}
-		
-		event.prevent_default();	
-	})
-
-};
-
-
-
 
 //use interface
 impl App {
@@ -116,7 +104,7 @@ impl App {
 
     fn rand(a: i8, b: i8) -> bool {
         let mut rng = rand::thread_rng();
-        let x = rng.gen_range(0, b);
+        let x = rng.gen_range(0..b);
         x < a
     }
 
@@ -152,7 +140,7 @@ impl App {
     fn count_neighbours(&self, idx: usize, filterstate: State) -> usize {
         self.neighbours(idx)
             .iter()
-            .filter(|&&state| state = filterstate)
+            .filter(|&&state| state == filterstate)
             .count()
     }
     //Rendering for HTMl - wasm
@@ -199,11 +187,10 @@ impl Component for App {
                 engine
             },
             _interval: interval, //tick speed basically
+            options: Rc::new(get_options()),
         }
     }
 
-    //updates every 200ms
-    //buttons displayed at the bottom
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Random => {
@@ -268,12 +255,6 @@ impl Component for App {
                     false
                 }
             }
-
-            
-			            
-
-
-
         }
     }
 
@@ -299,38 +280,6 @@ impl Component for App {
             });
 
         html! {
-               /*
-                <section class="game-container">
-                    <header class="app-header">
-                       // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
-                        <h1 class="app-title">{ "Game of Life" }</h1>
-                    </header>
-                    <section class="game-area">
-
-                        <div class="game-of-life">
-                            { for cell_rows }
-                        </div>
-
-                        <div class="game-buttons">
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Start)}>{ "Start" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
-                        </div>
-                    </section>
-                </section>
-                /*
-                <footer class="app-footer">
-                    <strong class="footer-text">
-                      { "Game of Life - a yew experiment " }
-                    </strong>
-                    <a href="https://github.com/yewstack/yew" target="_blank">{ "source" }</a>
-                </footer>
-                */
-                */
-
-
             <div>
                 //this will be on the left side
                 <div class="split game-container">
@@ -353,65 +302,11 @@ impl Component for App {
                         </div>
                     </div>
                 </div>
-                
 
                 <div class = "split right">
-                    
-                    <form enctype ="text/plain" onsubmit={ form_onsubmit.callback(|_| Msg::Condition()) }>
-                        /*
-                        <h3 id="h3_1">{"Dead cells: "}</h3>
-                        <h3 id ="h3_2">{"Alive cells: "}</h3>
-                        <h3 id ="h3_3">{"Spawn limit: "}</h3>
-                        <h3 id ="h3_4">{"Revive: "}</h3>
-                        */
-
-                        <label for="deadCells">{"Dead cells:"}</label>
-                        <select name="deadCells" id="deadCells">
-                            <option selected>{"Range from 0 - 5"}</option>
-                            <option value="1">{"1"}</option>
-                            <option value="2">{"2"}</option>
-                            <option value="3">{"3"}</option>
-                            <option value="4">{"4"}</option>
-                            <option value="5">{"5"}</option>
-                        </select>
-                        <br>
-                       
-                        
-                        <label for="aliveCells">{"Alive cells:"}</label>
-                        <select name="aliveCells" id="aliveCells">
-                            <option selected>{"Range from 0 - 5"}</option>
-                            <option value="1">{"1"}</option>
-                            <option value="2">{"2"}</option>
-                            <option value="3">{"3"}</option>
-                            <option value="4">{"4"}</option>
-                            <option value="5">{"5"}</option>
-                        </select>
-                        <br>
-
-                        <label for="spawnLimit">{"Spawn Limit:"}</label>
-                        <select name="spawnLimit" id="spawnLimit">
-                            <option selected>{"Range from 0 - 5"}</option>
-                            <option value="1">{"1"}</option>
-                            <option value="2">{"2"}</option>
-                            <option value="3">{"3"}</option>
-                            <option value="4">{"4"}</option>
-                            <option value="5">{"5"}</option>
-                        </select>
-                        <br>
-
-                        <label for="reviveCells">{"Revive cells:"}</label>
-                        <select name="reviveCells" id="reviveCells">
-                            <option selected>{"Range from 0 - 5"}</option>
-                            <option value="1">{"1"}</option>
-                            <option value="2">{"2"}</option>
-                            <option value="3">{"3"}</option>
-                            <option value="4">{"4"}</option>
-                            <option value="5">{"5"}</option>
-                        </select>
-						<br><br>
-						<input type="submit" value="Submit"> 
-
-                    </form>
+                    <div class = "txt">
+                        <CodeEditor classes={"full-height"} options={ self.options.to_sys_options() } />
+                    </div>
 
                     <div class = "box">
                         //need to replace
@@ -421,12 +316,8 @@ impl Component for App {
                         <div class = "menu">{">"}</div>
                         //need to replace the arrow with the randomiser script
                         //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: right changer)}>{">"}</button>
-
                     </div>
-
-
                 </div>
-
             </div>
                 /*
                 <footer class="app-footer">
@@ -439,7 +330,6 @@ impl Component for App {
         }
     }
 }
-
 //rendering app with wasm
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());

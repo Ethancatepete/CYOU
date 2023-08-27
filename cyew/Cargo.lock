@@ -148,10 +148,14 @@ dependencies = [
  "gloo",
  "js-sys",
  "log",
+ "monaco",
  "rand",
  "rhai",
+ "split-yew",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-logger",
+ "web-sys",
  "yew",
 ]
 
@@ -529,6 +533,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "monaco"
+version = "0.3.0"
+source = "git+https://github.com/siku2/rust-monaco#794a4cc7819f9ed7eb06559e24f75a41e23cf22a"
+dependencies = [
+ "js-sys",
+ "paste",
+ "wasm-bindgen",
+ "web-sys",
+ "yew",
+]
+
+[[package]]
 name = "num-traits"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -561,6 +577,12 @@ name = "once_cell"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
+
+[[package]]
+name = "paste"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 
 [[package]]
 name = "percent-encoding"
@@ -845,6 +867,18 @@ dependencies = [
  "autocfg",
  "static_assertions",
  "version_check",
+]
+
+[[package]]
+name = "split-yew"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47b8bc37f0da23f2e248fd138f4e3fc6ed58fe56846143de420bfd68c511ff52"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+ "web-sys",
+ "yew",
 ]
 
 [[package]]
