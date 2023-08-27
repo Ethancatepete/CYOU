@@ -7,6 +7,10 @@ use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
 use yew::html::Scope;
 use yew::{classes, html, Component, Context, Html};
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlFormElement, FormData};
+use gloo_console::debug;
+
 
 pub enum Msg {
     Random,
@@ -31,6 +35,26 @@ pub struct App {
     engine: Engine,
     _interval: Interval, //how far each cell is form each other
 }
+
+const form_onsubmit {
+	Callback::from(move |event: SubmitEvent| {
+		let target: Option<EventTarget> = event.target();
+		debug!(target.clone());
+		let form = target.and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
+		debug!(form.clone());
+
+		if let Some(form) = form {
+			let form_data = FormData::new_with_form(&form);
+			debug!(form_data.expect("Form data"));
+		}
+		
+		event.prevent_default();	
+	})
+
+};
+
+
+
 
 //use interface
 impl App {
@@ -244,6 +268,12 @@ impl Component for App {
                     false
                 }
             }
+
+            
+			            
+
+
+
         }
     }
 
@@ -323,15 +353,65 @@ impl Component for App {
                         </div>
                     </div>
                 </div>
-
+                
 
                 <div class = "split right">
-                    <div class = "txt">
+                    
+                    <form enctype ="text/plain" onsubmit={ form_onsubmit.callback(|_| Msg::Condition()) }>
+                        /*
                         <h3 id="h3_1">{"Dead cells: "}</h3>
                         <h3 id ="h3_2">{"Alive cells: "}</h3>
                         <h3 id ="h3_3">{"Spawn limit: "}</h3>
                         <h3 id ="h3_4">{"Revive: "}</h3>
-                    </div>
+                        */
+
+                        <label for="deadCells">{"Dead cells:"}</label>
+                        <select name="deadCells" id="deadCells">
+                            <option selected>{"Range from 0 - 5"}</option>
+                            <option value="1">{"1"}</option>
+                            <option value="2">{"2"}</option>
+                            <option value="3">{"3"}</option>
+                            <option value="4">{"4"}</option>
+                            <option value="5">{"5"}</option>
+                        </select>
+                        <br>
+                       
+                        
+                        <label for="aliveCells">{"Alive cells:"}</label>
+                        <select name="aliveCells" id="aliveCells">
+                            <option selected>{"Range from 0 - 5"}</option>
+                            <option value="1">{"1"}</option>
+                            <option value="2">{"2"}</option>
+                            <option value="3">{"3"}</option>
+                            <option value="4">{"4"}</option>
+                            <option value="5">{"5"}</option>
+                        </select>
+                        <br>
+
+                        <label for="spawnLimit">{"Spawn Limit:"}</label>
+                        <select name="spawnLimit" id="spawnLimit">
+                            <option selected>{"Range from 0 - 5"}</option>
+                            <option value="1">{"1"}</option>
+                            <option value="2">{"2"}</option>
+                            <option value="3">{"3"}</option>
+                            <option value="4">{"4"}</option>
+                            <option value="5">{"5"}</option>
+                        </select>
+                        <br>
+
+                        <label for="reviveCells">{"Revive cells:"}</label>
+                        <select name="reviveCells" id="reviveCells">
+                            <option selected>{"Range from 0 - 5"}</option>
+                            <option value="1">{"1"}</option>
+                            <option value="2">{"2"}</option>
+                            <option value="3">{"3"}</option>
+                            <option value="4">{"4"}</option>
+                            <option value="5">{"5"}</option>
+                        </select>
+						<br><br>
+						<input type="submit" value="Submit"> 
+
+                    </form>
 
                     <div class = "box">
                         //need to replace

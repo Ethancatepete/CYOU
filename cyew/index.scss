@@ -81,7 +81,6 @@ body {
 }
 
 
-
 //the grid AND the buttons
 .game-area {
   width: 80%;
@@ -208,6 +207,7 @@ button:hover {
   color: white;
 }
 
+//bottom row
 .box {
   display: flex;
   height: 150px;
@@ -234,7 +234,7 @@ button:hover {
 }
 
 
-.txt {
+form {
   transition-duration: 0.2s;
   font-size: 25px;
   font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
@@ -243,6 +243,7 @@ button:hover {
   border: 2px solid #4CAF50;
 }
 
+/*
 #h3_1:hover {
   transition-duration: 0.2s;
   color: green;
@@ -266,7 +267,30 @@ button:hover {
   color: green;
   font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
 }
-	
+*/
+
+label {
+  display:block;
+}
+
+input[type="text"],
+textarea{
+  width: 100%;
+  padding: 5px;
+}
+
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor:pointer;
+}
+
+
+
+
+
 
 
 /*
