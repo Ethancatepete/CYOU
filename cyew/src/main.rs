@@ -90,6 +90,47 @@ impl App {
         self.cellules = new_cellules;
     }
 
+    fn rand(a: i8, b: i8) -> bool {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(0, b);
+        x < a
+    }
+
+    fn neighbours(&self, idx: usize) -> Vec<char> {
+        let mut neighbours = Vec::new();
+        let (x, y) = (idx % self.cellules_width, idx / self.cellules_width);
+
+        //goes through each neighbour
+        for i in -1..=1 {
+            for j in -1..=1 {
+                if i == 0 && j == 0 {
+                    continue; //skip the cell itself
+                }
+
+                let (x, y) = (x as i32 + i, y as i32 + j);
+                if x < 0 || y < 0 {
+                    continue; //skip if out of bounds
+                }
+
+                let (x, y) = (x as usize, y as usize);
+                if x >= self.cellules_width || y >= self.cellules_height {
+                    continue; //skip if out of bounds
+                }
+
+                let idx = y * self.cellules_width + x;
+                neighbours.push(self.cellules[idx].state);
+            }
+        }
+
+        neighbours
+    }
+
+    fn count_neighbours(&self, idx: usize, filterstate: State) -> usize {
+        self.neighbours(idx)
+            .iter()
+            .filter(|&&state| state = filterstate)
+            .count()
+    }
     //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
@@ -126,7 +167,13 @@ impl Component for App {
             ]), //5 enabled states by default
             cellules_width,
             cellules_height,
-            engine: Engine::new(),
+            engine: {
+                let mut engine = Engine::new();
+                engine.register_fn("rand", Self::rand);
+                engine.register_fn("neighbours", Self::neighbours);
+                engine.register_fn("count_neighbours", Self::count_neighbours);
+                engine
+            },
             _interval: interval, //tick speed basically
         }
     }
