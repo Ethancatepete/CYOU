@@ -7,7 +7,7 @@ use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
 use std::rc::Rc;
-use yew::{classes, html, html::Scope, Component, Context, Html};
+use yew::{classes, html, html::Scope, Component, Context, Html, use_state, function_component, Callback};
 
 const CONTENT: &str = include_str!("main.rs");
 
@@ -279,6 +279,23 @@ impl Component for App {
                 }
             });
 
+
+
+    #[function_component(useState)]
+    fn state() -> Html {
+        let counter = use_state(|| 0);
+        let rightClick = {
+            let counter = counter.clone();
+            Callback::from(move |_| counter.set(*counter + 1)) //in future use index of the hashmap key
+        };
+
+        let leftClick = {
+            let counter = counter.clone();
+            Callback::from(move |_| counter.set(*counter - 1))
+        };
+    };
+
+
         html! {
             <div>
                 //this will be on the left side
@@ -311,9 +328,14 @@ impl Component for App {
                     <div class = "box">
                         //need to replace
                         //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: left changer)}>{"<"}</button>
-                        <div class = "menu">{"<"}</div>
-                        <div>{"Counter"}</div>
-                        <div class = "menu">{">"}</div>
+                        <div class = "menu" {leftClick}>{"<"}</div>
+                        <div>
+
+                        {"Counter: "}
+                        { *counter }
+
+                        </div>
+                        <div class = "menu" {rightClick}>{">"}</div>
                         //need to replace the arrow with the randomiser script
                         //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: right changer)}>{">"}</button>
                     </div>
