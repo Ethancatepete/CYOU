@@ -7,7 +7,9 @@ use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
 use std::rc::Rc;
-use yew::{classes, html, html::Scope, Component, Context, Html, use_state, function_component, Callback};
+use yew::{
+    classes, function_component, html, html::Scope, use_state, Callback, Component, Context, Html,
+};
 
 const CONTENT: &str = include_str!("main.rs");
 
@@ -279,22 +281,19 @@ impl Component for App {
                 }
             });
 
+        // #[function_component(useState)]
+        // fn state() -> Html {
+        //     let counter = use_state(|| 0);
+        //     let rightClick = {
+        //         let counter = counter.clone();
+        //         Callback::from(move |_| counter.set(*counter + 1)) //in future use index of the hashmap key
+        //     };
 
-
-    #[function_component(useState)]
-    fn state() -> Html {
-        let counter = use_state(|| 0);
-        let rightClick = {
-            let counter = counter.clone();
-            Callback::from(move |_| counter.set(*counter + 1)) //in future use index of the hashmap key
-        };
-
-        let leftClick = {
-            let counter = counter.clone();
-            Callback::from(move |_| counter.set(*counter - 1))
-        };
-    };
-
+        //     let leftClick = {
+        //         let counter = counter.clone();
+        //         Callback::from(move |_| counter.set(*counter - 1))
+        //     };
+        // }
 
         html! {
             <div>
@@ -321,23 +320,17 @@ impl Component for App {
                 </div>
 
                 <div class = "split right">
-                    <div class = "txt">
-                        <CodeEditor classes={"full-height"} options={ self.options.to_sys_options() } />
+                    <div class="nav">
+                        <button class="A nav-button" onclick={ctx.link().callback(|_| Msg::SetState('A'))}>{ "A" }</button>
+                        <button class="B nav-button" onclick={ctx.link().callback(|_| Msg::SetState('B'))}>{ "B" }</button>
+                        <button class="C nav-button" onclick={ctx.link().callback(|_| Msg::SetState('C'))}>{ "C" }</button>
+                        <button class="D nav-button" onclick={ctx.link().callback(|_| Msg::SetState('D'))}>{ "D" }</button>
+                        <button class="E nav-button" onclick={ctx.link().callback(|_| Msg::SetState('E'))}>{ "E" }</button>
                     </div>
 
-                    <div class = "box">
-                        //need to replace
-                        //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: left changer)}>{"<"}</button>
-                        <div class = "menu" {leftClick}>{"<"}</div>
-                        <div>
 
-                        {"Counter: "}
-                        { *counter }
-
-                        </div>
-                        <div class = "menu" {rightClick}>{">"}</div>
-                        //need to replace the arrow with the randomiser script
-                        //<button class="game-button menu" onclick={ctx.link().callback(|_| Msg:: right changer)}>{">"}</button>
+                    <div class = "txt">
+                        <CodeEditor classes={"full-height"} options={ self.options.to_sys_options() } />
                     </div>
                 </div>
             </div>

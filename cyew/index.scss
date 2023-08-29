@@ -5,6 +5,8 @@ body {
   margin: 0;
   padding: 0;
   text-align: center;
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
 }
 
 body {
@@ -13,7 +15,6 @@ body {
   //color: #4d4d4d;
   color: #FFBF00;
 
-  //of margin I think
   min-width: 230px;
   max-width: 1000px;
   margin: 0 auto;
@@ -21,27 +22,13 @@ body {
   -moz-font-smoothing: antialiased;
   font-weight: 300;
 
-  //outside square - border colour
   background-color: #1f1f1f;
-}
-
-//need to insert / delete
-.app-logo {
-  animation: app-logo-scale infinite 4s linear;
-  height: 80px;
-  width: 80px;
-}
-
-.app-header {
-  background-color: #1f1f1f; //this is the margin for the game
-  height: 40px; //how large margin is
-  color: aliceblue; //colour of "Game of life text"
-  padding: 20px;
 }
 
 //updating the text
 .app-title {
-  font-size: 35px;
+  font-size: 64px;
+  padding-bottom: 20px;
   font-family: "Raleway", sans-serif;
   width: 100%;
   font-weight: 100;
@@ -50,25 +37,6 @@ body {
   -moz-text-rendering: optimizeLegibility;
   text-rendering: optimizeLegibility;
 }
-
-/*
-//the text below to the original source
-.app-footer {
-  background-color: #000000; //no clue what this is for
-  height: 30px;
-  padding: 10px;
-}
-
-//modify the text
-.footer-text {
-  color: red;
-  padding-left: 20px;
-  font-size: 14px;
-}
-*/
-
-//split game-area
-//split control
 
 .split {
   height: 90%;
@@ -117,8 +85,8 @@ body {
 
 .game-cellule {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 15px;
+  height: 15px;
   border: 1px solid #cccccc11;
 }
 
@@ -190,7 +158,21 @@ body {
   width: 100%
 }
 
-button {
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  font-size: 24px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+.nav-button {
+  width: 100%;
+}
+
+.game-button {
   background-color: #3f3f3f; 
   transition-duration: 0.2s;
   border: none;
@@ -199,10 +181,10 @@ button {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 16px;
+  font-size: 24px;
 }
 
-button:hover {
+.game-button:hover {
   background-color: #4CAF50; /* Green */
   color: white;
 }
@@ -212,7 +194,7 @@ button:hover {
   display: flex;
   height: 150px;
   flex-direction: row;
-  justify-content: center; //source of problems?
+  // justify-content: center; //source of problems?
   align-content: space-between;
   align-items: end;
 }
@@ -223,7 +205,7 @@ button:hover {
   background-color: #3f3f3f; /* Gray */
   color: white;
   margin: 10px;
-  text-align: center; //source of problems?
+  // text-align: center; //source of problems?
   font-size: 60px;
   border: 30px solid #3f3f3f;
 }
