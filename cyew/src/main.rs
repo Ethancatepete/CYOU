@@ -293,6 +293,15 @@ impl Component for App {
             let counter = counter.clone();
             Callback::from(move |_| counter.set(*counter - 1))
         };
+
+
+        html!{
+            counter = 
+
+        }
+
+
+
     };
 
 
