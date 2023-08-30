@@ -2,7 +2,11 @@ mod cell; //importing cell.rs code
 
 use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
-use monaco::{api::CodeEditorOptions, sys::editor::BuiltinTheme, yew::CodeEditor};
+use monaco::{
+    api::{CodeEditorOptions, TextModel},
+    sys::editor::BuiltinTheme,
+    yew::CodeEditor,
+};
 use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
@@ -11,7 +15,7 @@ use yew::{
     classes, function_component, html, html::Scope, use_state, Callback, Component, Context, Html,
 };
 
-const CONTENT: &str = include_str!("main.rs");
+const CONTENT: &str = include_str!("editing.txt");
 
 fn get_options() -> CodeEditorOptions {
     CodeEditorOptions::default()
@@ -27,7 +31,7 @@ pub enum Msg {
     Step, //go step by step
     Reset,
     Stop,
-    Conditions(String), // Name of condition as a rhai script
+    Conditions(String), // Name of condition as a rhai script, text models?
     SetState(char),     // change state of
     ToggleCellule(usize),
     Tick, // game update tick
@@ -35,9 +39,9 @@ pub enum Msg {
 
 //creation of grid
 pub struct App {
-    active: bool,          // is the game running
+    active: bool,                           // is the game running
     selected_state: State, // what state is selected, must be a state in cell_states
-    cell_states: HashMap<State, String>,
+    cell_states: HashMap<State, TextModel>, // set and textmodel? language as rhaiscript
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
@@ -57,7 +61,8 @@ impl App {
             self.cell_states.remove(&state);
             return Ok(());
         } else {
-            self.cell_states.insert(state, state.to_string());
+            self.cell_states
+                .insert(state, TextModel::create("", Some("rust"), None).unwrap());
             return Ok(());
         }
     }
@@ -88,16 +93,15 @@ impl App {
 
         //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
-            let result = self.engine.eval::<State>(&self.cell_states[&cellule.state]);
+            let result = self
+                .engine
+                .eval::<char>(&self.cell_states[&cellule.state].get_value());
+            log::info!("{:?}", result);
             match result {
                 Ok(state) => {
                     new_cellules[idx].set_state(state);
                 }
-                Err(err) => {
-                    if let EvalAltResult::ErrorRuntime(err, _) = *err {
-                        log::error!("Error: {}", err);
-                    }
-                }
+                Err(err) => if let EvalAltResult::ErrorRuntime(err, _) = *err {},
             }
         }
 
@@ -173,11 +177,26 @@ impl Component for App {
             selected_state: 'B', //default state
             cellules: vec![Cellule::new('A'); cellules_width * cellules_height], //everything set to dead
             cell_states: HashMap::from([
-                ('A', "A".to_string()),
-                ('B', "B".to_string()),
-                ('C', "C".to_string()),
-                ('D', "D".to_string()),
-                ('E', "E".to_string()),
+                (
+                    'A',
+                    TextModel::create("return \'B\'", Some("rust"), None).unwrap(),
+                ),
+                (
+                    'B',
+                    TextModel::create("return \'C\'", Some("rust"), None).unwrap(),
+                ),
+                (
+                    'C',
+                    TextModel::create("return \'D\'", Some("rust"), None).unwrap(),
+                ),
+                (
+                    'D',
+                    TextModel::create("return \'E'", Some("rust"), None).unwrap(),
+                ),
+                (
+                    'E',
+                    TextModel::create("return \'A\'", Some("rust"), None).unwrap(),
+                ),
             ]), //5 enabled states by default
             cellules_width,
             cellules_height,
@@ -239,6 +258,7 @@ impl Component for App {
             Msg::SetState(state) => {
                 if self.cell_states.contains_key(&state) {
                     self.selected_state = state;
+
                     true
                 } else {
                     log::error!("Invalid state: {}", state);
@@ -250,7 +270,7 @@ impl Component for App {
                 let state = self.selected_state;
                 // update the string in the hashmap
                 if self.cell_states.contains_key(&state) {
-                    self.cell_states.insert(state, condition);
+                    self.cell_states[&state].set_value(&condition);
                     true
                 } else {
                     log::error!("Invalid selected state: {}", state);
@@ -281,47 +301,6 @@ impl Component for App {
                 }
             });
 
-        // #[function_component(useState)]
-        // fn state() -> Html {
-        //     let counter = use_state(|| 0);
-        //     let rightClick = {
-        //         let counter = counter.clone();
-        //         Callback::from(move |_| counter.set(*counter + 1)) //in future use index of the hashmap key
-        //     };
-/*
-<<<<<<< HEAD
-
-    #[function_component(useState)]
-    fn state() -> Html {
-        let counter = use_state(|| 0);
-        let rightClick = {
-            let counter = counter.clone();
-            Callback::from(move |_| counter.set(*counter + 1)) //in future use index of the hashmap key
-        };
-
-        let leftClick = {
-            let counter = counter.clone();
-            Callback::from(move |_| counter.set(*counter - 1))
-        };
-
-
-        html!{
-            counter = 
-
-        }
-
-
-
-    };
-
-=======
-        //     let leftClick = {
-        //         let counter = counter.clone();
-        //         Callback::from(move |_| counter.set(*counter - 1))
-        //     };
-        // }
->>>>>>> refs/remotes/origin/main
-*/
         html! {
             <div>
                 //this will be on the left side
@@ -361,14 +340,6 @@ impl Component for App {
                     </div>
                 </div>
             </div>
-                /*
-                <footer class="app-footer">
-                    <strong class="footer-text">
-                      { "Game of Life - a yew experiment " }
-                    </strong>
-                    <a href="https://github.com/yewstack/yew" target="_blank">{ "source" }</a>
-                </footer>
-                */
         }
     }
 }
