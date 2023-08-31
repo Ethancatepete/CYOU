@@ -3,7 +3,7 @@ mod cell; //importing cell.rs code
 use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
 use monaco::{
-    api::{CodeEditorOptions, TextModel},
+    api::{CodeEditor as MonacoCodeEditor, CodeEditorOptions, TextModel},
     sys::editor::BuiltinTheme,
     yew::CodeEditor,
 };
@@ -15,7 +15,7 @@ use yew::{
     classes, function_component, html, html::Scope, use_state, Callback, Component, Context, Html,
 };
 
-const CONTENT: &str = include_str!("editing.txt");
+const CONTENT: &str = include_str!("main.rs");
 
 fn get_options() -> CodeEditorOptions {
     CodeEditorOptions::default()
@@ -336,7 +336,17 @@ impl Component for App {
 
 
                     <div class = "txt">
-                        <CodeEditor classes={"full-height"} options={ self.options.to_sys_options() } />
+                        <CodeEditor classes={"full-height"} options={
+                            CodeEditorOptions::default()
+                                .with_language("rust".to_owned())
+                                .with_value(self.cell_states[&self.selected_state].get_value())
+                                .with_builtin_theme(BuiltinTheme::VsDark)
+                                .with_automatic_layout(true)
+                                .to_sys_options()
+                        } />
+                        <br />
+                        <button class="game-button" onclick={ctx.link().callback(|_| Msg::Condition("".to_string()))}>{ "Submit" }</button>
+
                     </div>
                 </div>
             </div>
