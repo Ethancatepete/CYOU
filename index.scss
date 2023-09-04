@@ -1,0 +1,267 @@
+html,
+
+//title customization
+body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+body {
+  font: 14px "Raleway", Helvetica, Arial, sans-serif;
+  line-height: 1.4em;
+  //color: #4d4d4d;
+  color: #FFBF00;
+
+  min-width: 230px;
+  max-width: 1000px;
+  margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  font-weight: 300;
+
+  background-color: #1f1f1f;
+}
+
+//updating the text
+.app-title {
+  font-size: 64px;
+  padding-bottom: 20px;
+  font-family: "Raleway", sans-serif;
+  width: 100%;
+  font-weight: 100;
+  text-align: center; 
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+}
+
+.split {
+  height: 90%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden; //need to reduce siae of x
+  padding-top:10px;
+}
+
+
+//the grid AND the buttons
+.game-area {
+  width: 80%;
+  margin: 10px auto;
+}
+
+//the square surronding the grid
+//split screen to the left
+.game-container {
+  left: 0;
+  background: #1f1f1f;
+  margin: 10px 0 0px 0;
+}
+
+//right side
+//h3.text
+.right {
+  right: 0;
+  //background: red;
+}
+
+
+//modify this area in order to move the grid
+.game-of-life {
+  display: inline-block;
+  background-color: aliceblue;
+  width: max-content;
+  overflow: hidden;
+}
+
+.game-row {
+  line-height: 0; // how far rows are from each other -dont touch
+}
+
+.game-cellule {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #cccccc11;
+}
+
+.A {
+  background-color: #F1F2F3;
+}
+
+.B {
+  background-color: #00FFFF;
+}
+
+.C {
+  background-color: #98FF98;
+}
+
+.D {
+  background-color: #FAF884;
+}
+
+.E {
+  background-color: #FFF44F;
+}
+
+.F {
+  background-color: #FFDAB9;
+}
+
+.G {
+  background-color: #FF7F50;
+}
+
+.H {
+  background-color: #FF6B6B
+}
+
+.I {
+  background-color: #E6E6FA;
+}
+
+.J {
+  background-color: #C8A2C8
+}
+
+.K {
+  background-color: #87CEEB;
+}
+
+.L {
+  background-color: #4169E1;
+}
+
+.M {
+  background-color: #4B0082;
+}
+
+.N {
+  background-color: #708090;
+}
+
+.O {
+  background-color: #36454F;
+}
+
+.P {
+  background-color: #001F1F;
+}
+
+.game-buttons {
+  width: 100%
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  font-size: 24px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+.nav-button {
+
+  height: 50px;
+  width: 95%;
+  font-weight: bold;
+  transition: 0.2s ease;
+
+}
+
+.nav-button:hover{
+  border: 5px solid black;
+  //border-color: black;
+}
+
+
+.game-button {
+  background-color: #3f3f3f; 
+  transition-duration: 0.2s;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+}
+
+.game-button:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+//bottom row
+/*
+
+.box {
+  display: flex;
+  height: 150px;
+  flex-direction: row;
+  // justify-content: center; //source of problems?
+  align-content: space-between;
+  align-items: end;
+}
+
+.box > div {
+  transition-duration: 0.2s;
+  background-color: #3f3f3f; 
+  color: white;
+  margin: 10px;
+  // text-align: center; //source of problems?
+  font-size: 60px;
+  border: 30px solid #3f3f3f;
+}
+
+.menu:hover{	
+  background-color: #4CAF50; 
+  color: white;
+}
+*/
+
+.txt {
+  transition-duration: 0.2s;
+  text-align: left;
+  font-size: 25px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+  margin: 10px; //affects distance from nav button to code editor
+  border: 2px solid #4CAF50;
+  height: 500px;
+}
+/*
+#h3_1:hover {
+  transition-duration: 0.2s;
+  color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+#h3_2:hover {
+  transition-duration: 0.2s;
+  color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+#h3_3:hover {
+  transition-duration: 0.2s;
+  color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+#h3_4:hover {
+  transition-duration: 0.2s;
+  color: green;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+*/
+.full-height {
+  height: 100%;
+}
