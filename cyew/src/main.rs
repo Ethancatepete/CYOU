@@ -3,27 +3,14 @@ mod cell; //importing cell.rs code
 use cell::{Cellule, State};
 use gloo::timers::callback::Interval;
 use monaco::{
-    api::{CodeEditor as MonacoCodeEditor, CodeEditorOptions, TextModel},
+    api::{CodeEditorOptions, TextModel},
     sys::editor::BuiltinTheme,
     yew::CodeEditor,
 };
 use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::HashMap;
-use std::rc::Rc;
-use yew::{
-    classes, function_component, html, html::Scope, use_state, Callback, Component, Context, Html,
-};
-
-const CONTENT: &str = include_str!("main.rs");
-
-fn get_options() -> CodeEditorOptions {
-    CodeEditorOptions::default()
-        .with_language("rust".to_owned())
-        .with_value(CONTENT.to_owned())
-        .with_builtin_theme(BuiltinTheme::VsDark)
-        .with_automatic_layout(true)
-}
+use yew::{classes, html, html::Scope, Component, Context, Html};
 
 pub enum Msg {
     Random,
@@ -47,7 +34,6 @@ pub struct App {
     cellules_height: usize,
     engine: Engine,
     _interval: Interval, //how far each cell is from each other
-    options: Rc<CodeEditorOptions>,
 }
 
 //use interface
@@ -101,7 +87,7 @@ impl App {
                 Ok(state) => {
                     new_cellules[idx].set_state(state);
                 }
-                Err(err) => if let EvalAltResult::ErrorRuntime(err, _) = *err {},
+                Err(err) => if let EvalAltResult::ErrorRuntime(_err, _) = *err {},
             }
         }
 
@@ -208,7 +194,6 @@ impl Component for App {
                 engine
             },
             _interval: interval, //tick speed basically
-            options: Rc::new(get_options()),
         }
     }
 
@@ -339,13 +324,13 @@ impl Component for App {
                         <CodeEditor classes={"full-height"} options={
                             CodeEditorOptions::default()
                                 .with_language("rust".to_owned())
-                                .with_value(self.cell_states[&self.selected_state].get_value())
+                                .with_model(self.cell_states[&self.selected_state].clone())
                                 .with_builtin_theme(BuiltinTheme::VsDark)
                                 .with_automatic_layout(true)
                                 .to_sys_options()
                         } />
                         <br />
-                        <button class="game-button" onclick={ctx.link().callback(|_| Msg::Condition("".to_string()))}>{ "Submit" }</button>
+                        <button class="game-button" onclick={ctx.link().callback(|_| Msg::Conditions("".to_string()))}>{ "Submit" }</button>
 
                     </div>
                 </div>
