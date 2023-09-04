@@ -32,6 +32,7 @@ pub struct App {
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
+    current_eval_cell: usize, //current cell being evaluated
     engine: Engine,
     _interval: Interval, //how far each cell is from each other
 }
@@ -79,6 +80,7 @@ impl App {
 
         //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
+            self.current_eval_cell = idx;
             let result = self
                 .engine
                 .eval::<char>(&self.cell_states[&cellule.state].get_value());
@@ -94,13 +96,27 @@ impl App {
         self.cellules = new_cellules;
     }
 
-    fn rand(a: i8, b: i8) -> bool {
+    fn rand(a: i64, b: i64) -> bool {
         let mut rng = rand::thread_rng();
         let x = rng.gen_range(0..b);
         x < a
     }
 
-    fn neighbours(&self, idx: usize) -> Vec<char> {
+    fn rand_state() -> char {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(0..5);
+        match x {
+            0 => 'A',
+            1 => 'B',
+            2 => 'C',
+            3 => 'D',
+            4 => 'E',
+            _ => 'A',
+        }
+    }
+
+    fn neighbours(&self) -> Vec<char> {
+        let idx = self.current_eval_cell;
         let mut neighbours = Vec::new();
         let (x, y) = (idx % self.cellules_width, idx / self.cellules_width);
 
@@ -129,10 +145,10 @@ impl App {
         neighbours
     }
 
-    fn count_neighbours(&self, idx: usize, filterstate: State) -> usize {
-        self.neighbours(idx)
+    fn count_neighbours(&self, filterstate: char) -> usize {
+        self.neighbours()
             .iter()
-            .filter(|&&state| state == filterstate)
+            .filter(|&state| state == &filterstate)
             .count()
     }
     //Rendering for HTMl - wasm
@@ -186,11 +202,13 @@ impl Component for App {
             ]), //5 enabled states by default
             cellules_width,
             cellules_height,
+            current_eval_cell: 0,
             engine: {
                 let mut engine = Engine::new();
                 engine.register_fn("rand", Self::rand);
                 engine.register_fn("neighbours", Self::neighbours);
                 engine.register_fn("count_neighbours", Self::count_neighbours);
+                engine.register_fn("rand_state", Self::rand_state);
                 engine
             },
             _interval: interval, //tick speed basically
