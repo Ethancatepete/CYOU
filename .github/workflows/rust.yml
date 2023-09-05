@@ -12,7 +12,7 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v3
@@ -22,3 +22,4 @@ jobs:
       run: cargo install trunk wasm-bindgen-cli
     - name: trunk build
       run: trunk build --release
+    
