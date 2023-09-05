@@ -9,7 +9,7 @@ use monaco::{
 };
 use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use yew::{classes, html, html::Scope, Component, Context, Html};
 
 pub enum Msg {
@@ -21,14 +21,16 @@ pub enum Msg {
     Conditions(String), // Name of condition as a rhai script, text models?
     SetState(char),     // change state of
     ToggleCellule(usize),
+    AddState,
+    RemoveState,
     Tick, // game update tick
 }
 
 //creation of grid
 pub struct App {
-    active: bool,                           // is the game running
+    active: bool,                            // is the game running
     selected_state: State, // what state is selected, must be a state in cell_states
-    cell_states: HashMap<State, TextModel>, // set and textmodel? language as rhaiscript
+    cell_states: BTreeMap<State, TextModel>, // set and textmodel? language as rhaiscript
     cellules: Vec<Cellule>,
     cellules_width: usize,
     cellules_height: usize,
@@ -178,7 +180,7 @@ impl Component for App {
             active: false,       //does not start game
             selected_state: 'B', //default state
             cellules: vec![Cellule::new('A'); cellules_width * cellules_height], //everything set to dead
-            cell_states: HashMap::from([
+            cell_states: BTreeMap::from([
                 (
                     'A',
                     TextModel::create("return \'B\'", Some("rust"), None).unwrap(),
@@ -271,7 +273,7 @@ impl Component for App {
 
             Msg::Conditions(condition) => {
                 let state = self.selected_state;
-                // update the string in the hashmap
+                // update the string in the btreemap
                 if self.cell_states.contains_key(&state) {
                     self.cell_states[&state].set_value(&condition);
                     true
@@ -279,6 +281,49 @@ impl Component for App {
                     log::error!("Invalid selected state: {}", state);
                     false
                 }
+            }
+
+            Msg::AddState => {
+                if self.cell_states.len() >= 16 {
+                    log::error!("Too many states");
+                    return false;
+                }
+
+                let mut new_state = 'A';
+                while self.cell_states.contains_key(&new_state) {
+                    new_state = (new_state as u8 + 1) as char;
+                }
+
+                self.cell_states.insert(
+                    new_state,
+                    TextModel::create("", Some("rust"), None).unwrap(),
+                );
+                self.selected_state = new_state;
+                true
+            }
+
+            Msg::RemoveState => {
+                if self.cell_states.len() <= 2 {
+                    log::error!("Too few states");
+                    return false;
+                }
+
+                if self.selected_state == *self.cell_states.keys().last().unwrap() {
+                    self.selected_state = *self.cell_states.keys().nth(1).unwrap();
+                }
+
+                for cellule in self.cellules.iter_mut() {
+                    if cellule.state == *self.cell_states.keys().last().unwrap() {
+                        cellule.set_state(*self.cell_states.keys().nth(1).unwrap());
+                    }
+                }
+
+                let last_state = self.cell_states.keys().last().unwrap().clone();
+                self.cell_states.remove(&last_state);
+
+                log::info!("removed state {}", last_state);
+                log::info!("{:?}", self.cell_states.clone());
+                true
             }
         }
     }
@@ -304,9 +349,13 @@ impl Component for App {
                 }
             });
 
+        // sort the cell_states btreemap based on the keys (character smallest to largest a-m)
+
+        let available_states = self.cell_states.keys().cloned().collect::<Vec<char>>();
+
         html! {
             <div>
-                //this will be on the left side
+            //this will be on the eft side
                 <div class="split game-container">
                     <header class="app-header">
                        // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
@@ -330,11 +379,14 @@ impl Component for App {
 
                 <div class = "split right">
                     <div class="nav">
-                        <button class="A nav-button" onclick={ctx.link().callback(|_| Msg::SetState('A'))}>{ "A" }</button>
-                        <button class="B nav-button" onclick={ctx.link().callback(|_| Msg::SetState('B'))}>{ "B" }</button>
-                        <button class="C nav-button" onclick={ctx.link().callback(|_| Msg::SetState('C'))}>{ "C" }</button>
-                        <button class="D nav-button" onclick={ctx.link().callback(|_| Msg::SetState('D'))}>{ "D" }</button>
-                        <button class="E nav-button" onclick={ctx.link().callback(|_| Msg::SetState('E'))}>{ "E" }</button>
+                        <button class="- nav-button" onclick={ctx.link().callback(|_| Msg::RemoveState)}>{ "-"}</button>
+                        {
+                            available_states.into_iter().map(|state| {
+                                let class_string = format!("{} nav-button", state);
+                                html!{ <button class={ class_string } onclick={ctx.link().callback(move |_| Msg::SetState(state))}>{ state }</button>}
+                            }).collect::<Html>()
+                        }
+                        <button class="+ nav-button" onclick={ctx.link().callback(|_| Msg::AddState)}>{ "+" }</button>
                     </div>
 
 
