@@ -36,7 +36,7 @@ pub struct App {
     cellules_height: usize,
     current_eval_cell: usize, //current cell being evaluated
     engine: Engine,
-    _interval: Interval, //how far each cell is from each other
+    _interval: Interval,
 }
 
 //use interface
@@ -83,9 +83,12 @@ impl App {
         //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
             self.current_eval_cell = idx;
-            let result = self
-                .engine
-                .eval::<char>(&self.cell_states[&cellule.state].get_value());
+            let result = self.engine.eval::<char>(&format!(
+                "const CURRENT = {cell_id};\nconst NEIGHBOURS = {neighbours} \n{code}",
+                cell_id = idx,
+                neighbours = self.neighbours(),
+                code = &self.cell_states[&cellule.state].get_value()
+            ));
             log::info!("{:?}", result);
             match result {
                 Ok(state) => {
@@ -143,7 +146,6 @@ impl App {
                 neighbours.push(self.cellules[idx].state);
             }
         }
-
         neighbours
     }
 
@@ -400,8 +402,6 @@ impl Component for App {
                                 .to_sys_options()
                         } />
                         <br />
-                        <button class="game-button" onclick={ctx.link().callback(|_| Msg::Conditions("".to_string()))}>{ "Submit" }</button>
-
                     </div>
                 </div>
             </div>
