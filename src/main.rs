@@ -83,13 +83,20 @@ impl App {
         //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
             self.current_eval_cell = idx;
-            let result = self.engine.eval::<char>(&format!(
-                "const CURRENT = {cell_id};\nconst NEIGHBOURS = {neighbours} \n{code}",
+            let script = format!(
+                "const CURRENT = {cell_id};\nconst NEIGHBOURS = [{neighbours}];\n{code}",
                 cell_id = idx,
-                neighbours = self.neighbours(),
+                neighbours = self
+                    .neighbours()
+                    .iter()
+                    .enumerate()
+                    .map(|(index, _element)| format!("{}", index))
+                    .collect::<Vec<String>>()
+                    .join(", "),
                 code = &self.cell_states[&cellule.state].get_value()
-            ));
-            log::info!("{:?}", result);
+            );
+            let result = self.engine.eval::<char>(&script);
+            // log::info!("{:?}", result);
             match result {
                 Ok(state) => {
                     new_cellules[idx].set_state(state);
@@ -185,23 +192,23 @@ impl Component for App {
             cell_states: BTreeMap::from([
                 (
                     'A',
-                    TextModel::create("return \'B\'", Some("rust"), None).unwrap(),
+                    TextModel::create("return \'B\';", Some("rust"), None).unwrap(),
                 ),
                 (
                     'B',
-                    TextModel::create("return \'C\'", Some("rust"), None).unwrap(),
+                    TextModel::create("return \'C\';", Some("rust"), None).unwrap(),
                 ),
                 (
                     'C',
-                    TextModel::create("return \'D\'", Some("rust"), None).unwrap(),
+                    TextModel::create("return \'D\';", Some("rust"), None).unwrap(),
                 ),
                 (
                     'D',
-                    TextModel::create("return \'E'", Some("rust"), None).unwrap(),
+                    TextModel::create("return \'E\';", Some("rust"), None).unwrap(),
                 ),
                 (
                     'E',
-                    TextModel::create("return \'A\'", Some("rust"), None).unwrap(),
+                    TextModel::create("return \'A\';", Some("rust"), None).unwrap(),
                 ),
             ]), //5 enabled states by default
             cellules_width,
