@@ -59,7 +59,7 @@ body {
 //split screen to the left
 .game-container {
   left: 0;
-  background: #1f1f1f;
+  background: #111111;
   margin: 10px 0 0px 0;
 }
 
@@ -74,7 +74,7 @@ body {
 //modify this area in order to move the grid
 .game-of-life {
   display: inline-block;
-  background-color: aliceblue;
+  background-color: #1f1f1f;
   width: max-content;
   overflow: hidden;
 }
@@ -87,7 +87,7 @@ body {
   display: inline-block;
   width: 15px;
   height: 15px;
-  border: 1px solid #cccccc11;
+  border: 1px solid #cccccc;
 }
 
 .A {

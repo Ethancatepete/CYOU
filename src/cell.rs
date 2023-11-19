@@ -1,4 +1,3 @@
-//Either two states
 pub type State = char;
 
 #[derive(Clone, Copy)]

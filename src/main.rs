@@ -10,6 +10,7 @@ use monaco::{
 use rand::{seq::IteratorRandom, Rng};
 use rhai::{Engine, EvalAltResult};
 use std::collections::BTreeMap;
+use std::sync::{Arc, RwLock};
 use yew::{classes, html, html::Scope, Component, Context, Html};
 
 pub enum Msg {
@@ -23,6 +24,7 @@ pub enum Msg {
     ToggleCellule(usize),
     AddState,
     RemoveState,
+    UpdateSize(String, isize),
     Tick, // game update tick
 }
 
@@ -36,6 +38,7 @@ pub struct App {
     cellules_height: usize,
     current_eval_cell: usize, //current cell being evaluated
     engine: Engine,
+    logbook: Arc<RwLock<Vec<String>>>,
     _interval: Interval,
 }
 
@@ -83,18 +86,28 @@ impl App {
         //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
             self.current_eval_cell = idx;
+
+            let neighbours: String = self
+                .neighbours()
+                .iter()
+                .map(|c| format!("'{}'", c))
+                .collect::<Vec<String>>()
+                .join(", ");
+
             let script = format!(
-                "const CURRENT = {cell_id};\nconst NEIGHBOURS = [{neighbours}];\n{code}",
+                "let current = {cell_id};\nlet neighbours = [{neighbours}];\n{code}",
                 cell_id = idx,
-                neighbours = self
-                    .neighbours()
-                    .iter()
-                    .enumerate()
-                    .map(|(index, _element)| format!("{}", index))
-                    .collect::<Vec<String>>()
-                    .join(", "),
+                neighbours = neighbours,
                 code = &self.cell_states[&cellule.state].get_value()
             );
+
+            let log = self.logbook.clone();
+
+            self.engine.on_print(move |s| {
+                let entry = s.to_string();
+                log.write().unwrap().push(entry);
+            });
+
             let result = self.engine.eval::<char>(&script);
             // log::info!("{:?}", result);
             match result {
@@ -129,10 +142,13 @@ impl App {
 
     fn neighbours(&self) -> Vec<char> {
         let idx = self.current_eval_cell;
-        let mut neighbours = Vec::new();
+        let mut neighbours: Vec<char> = Vec::new();
         let (x, y) = (idx % self.cellules_width, idx / self.cellules_width);
 
         //goes through each neighbour
+        // 0 3 5
+        // 1   6
+        // 2 4 7
         for i in -1..=1 {
             for j in -1..=1 {
                 if i == 0 && j == 0 {
@@ -184,6 +200,8 @@ impl Component for App {
 
         let (cellules_width, cellules_height) = (60, 40); //grid is 53x40
 
+        let logbook = Arc::new(RwLock::new(Vec::<String>::new()));
+
         //runs the board as soon as the board is open - makes every cell dead
         Self {
             active: false,       //does not start game
@@ -222,6 +240,7 @@ impl Component for App {
                 engine.register_fn("rand_state", Self::rand_state);
                 engine
             },
+            logbook: logbook.clone(),
             _interval: interval, //tick speed basically
         }
     }
@@ -240,6 +259,7 @@ impl Component for App {
             }
             Msg::Step => {
                 self.step();
+                log::info!("Step");
                 true
             }
             Msg::Reset => {
@@ -334,6 +354,41 @@ impl Component for App {
                 log::info!("{:?}", self.cell_states.clone());
                 true
             }
+
+            Msg::UpdateSize(side, amount) => { // straight up terrible code dont do this
+                if amount < 0 {
+                    if side == "width" && self.cellules_width <= 2 {
+                        return false;
+                    }
+                    if side == "height" && self.cellules_height <= 2 {
+                        return false;
+                    }
+
+                    if side == "width" {
+                        self.cellules_width -= 2;
+                    } else {
+                        self.cellules_height -= 2;
+                    }
+
+                } else {
+                    if side == "width" && self.cellules_width >= 100 {
+                        return false;
+                    }
+                    if side == "height" && self.cellules_height >= 100 {
+                        return false;
+                    }
+
+                    if side == "width" {
+                        self.cellules_width += 2;
+                    } else {
+                        self.cellules_height += 2;
+                    }
+                }
+
+                self.cellules = vec![Cellule::new('A'); self.cellules_width * self.cellules_height];
+                log::info!("grid new gwidth: {}, gheight: {}", self.cellules_width, self.cellules_height);
+                true
+            }
         }
     }
 
@@ -383,12 +438,20 @@ impl Component for App {
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
                             <button class="game-button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
                         </div>
+
+                        <div class="game-buttons">
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("width".to_string(), 1))}>{ "width++" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("width".to_string(), -1))}>{ "width--" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("height".to_string(), 1))}>{ "height++" }</button>
+                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("height".to_string(), -1))}>{ "height--" }</button>
+                        </div>
+
                     </div>
                 </div>
 
                 <div class = "split right">
                     <div class="nav">
-                        <button class="- nav-button" onclick={ctx.link().callback(|_| Msg::RemoveState)}>{ "-"}</button>
+                        <button class="- nav-button" onclick={ctx.link().callback(|_| Msg::RemoveState)}>{"-"}</button>
                         {
                             available_states.into_iter().map(|state| {
                                 let class_string = format!("{} nav-button", state);
@@ -409,6 +472,14 @@ impl Component for App {
                                 .to_sys_options()
                         } />
                         <br />
+                    </div>
+                    <div class="log">
+                        <h2>{"Log Book"}</h2>
+                        <ul>
+                        { for self.logbook.read().unwrap().iter().map(|entry| {
+                            html! { <li>{ entry }</li> }
+                        })}
+                        </ul>
                     </div>
                 </div>
             </div>
