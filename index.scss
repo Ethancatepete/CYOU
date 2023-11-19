@@ -1,93 +1,150 @@
 html,
 
-//title customization
 body {
   margin: 0;
   padding: 0;
   text-align: center;
   overflow-y: hidden; /* Hide vertical scrollbar */
   overflow-x: hidden; /* Hide horizontal scrollbar */
-}
 
-body {
   font: 14px "Raleway", Helvetica, Arial, sans-serif;
   line-height: 1.4em;
-  //color: #4d4d4d;
-  color: #FFBF00;
+  color: #f1f1f1;
 
   min-width: 230px;
-  max-width: 1000px;
   margin: 0 auto;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
   font-weight: 300;
 
-  background-color: #1f1f1f;
+  background-color: #111111;
 }
 
-//updating the text
-.app-title {
+.app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
   font-size: 64px;
   padding-bottom: 20px;
-  font-family: "Raleway", sans-serif;
+  font-family: "Lexend", sans-serif;
   width: 100%;
   font-weight: 100;
-  text-align: center; 
+  text-align: center;
   -webkit-text-rendering: optimizeLegibility;
   -moz-text-rendering: optimizeLegibility;
   text-rendering: optimizeLegibility;
 }
 
-.split {
-  height: 90%;
-  width: 50%;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  overflow-x: hidden; //need to reduce siae of x
-  padding-top:10px;
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  font-size: 64px;
+  padding-bottom: 20px;
+  font-family: "Lexend", sans-serif;
+  width: 100%;
+  font-weight: 100;
+  text-align: center;
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
 }
 
 
-//the grid AND the buttons
-.game-area {
-  width: 80%;
-  margin: 10px auto;
-}
-
-//the square surronding the grid
-//split screen to the left
-.game-container {
-  left: 0;
-  background: #111111;
-  margin: 10px 0 0px 0;
-}
-
-//right side
-//h3.text
-.right {
-  right: 0;
-  //background: red;
-}
-
-
-//modify this area in order to move the grid
-.game-of-life {
+.cellule {
   display: inline-block;
-  background-color: #1f1f1f;
-  width: max-content;
-  overflow: hidden;
-}
-
-.game-row {
-  line-height: 0; // how far rows are from each other -dont touch
-}
-
-.game-cellule {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
   border: 1px solid #cccccc;
+}
+
+.pane {
+  flex: 1;
+  border: 2px solid #3f3f3f;
+  padding: 2% 5%;
+  height: 100%;
+}
+
+.cells {
+  margin: auto;
+  line-height: 0;
+}
+
+.editor {
+  margin: auto;
+  height: 100%;
+}
+
+.code-editor {
+  transition-duration: 0.2s;
+  text-align: left;
+  font-size: 25px;
+  border: 2px solid #111111;
+  height: 60%;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  align-items: center;
+  text-align: center;
+  font-size: 36px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+.button {
+  background-color: #f1f1f1;
+  border: none;
+  height: 50px;
+  width: 95%;
+  font-size: 20px;
+}
+
+.button:hover{
+  background-color: #04AA6D;
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  align-items: center;
+  text-align: center;
+  font-size: 36px;
+  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
+}
+
+.nav-button {
+  border: none;
+  height: 50px;
+  width: 95%;
+  font-size: 24px;
+}
+
+.nav-button:hover{
+  border: 2px solid black;
+}
+
+.selected{
+  border: 4px solid black;
+}
+
+.editor-height {
+  height: 100%;
 }
 
 .A {
@@ -152,118 +209,4 @@ body {
 
 .P {
   background-color: #001F1F;
-}
-
-.game-buttons {
-  width: 100%
-}
-
-.nav {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-  text-align: center;
-  font-size: 24px;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-}
-
-.nav-button {
-
-  height: 50px;
-  width: 95%;
-  font-weight: bold;
-  transition: 0.2s ease;
-
-}
-
-.nav-button:hover{
-  border: 5px solid black;
-  //border-color: black;
-}
-
-
-.game-button {
-  background-color: #3f3f3f; 
-  transition-duration: 0.2s;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 24px;
-}
-
-.game-button:hover {
-  background-color: #4CAF50; /* Green */
-  color: white;
-}
-
-//bottom row
-/*
-
-.box {
-  display: flex;
-  height: 150px;
-  flex-direction: row;
-  // justify-content: center; //source of problems?
-  align-content: space-between;
-  align-items: end;
-}
-
-.box > div {
-  transition-duration: 0.2s;
-  background-color: #3f3f3f; 
-  color: white;
-  margin: 10px;
-  // text-align: center; //source of problems?
-  font-size: 60px;
-  border: 30px solid #3f3f3f;
-}
-
-.menu:hover{	
-  background-color: #4CAF50; 
-  color: white;
-}
-*/
-
-.txt {
-  transition-duration: 0.2s;
-  text-align: left;
-  font-size: 25px;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-  margin: 10px; //affects distance from nav button to code editor
-  border: 2px solid #4CAF50;
-  height: 500px;
-}
-/*
-#h3_1:hover {
-  transition-duration: 0.2s;
-  color: green;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-}
-
-#h3_2:hover {
-  transition-duration: 0.2s;
-  color: green;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-}
-
-#h3_3:hover {
-  transition-duration: 0.2s;
-  color: green;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-}
-
-#h3_4:hover {
-  transition-duration: 0.2s;
-  color: green;
-  font-family: "Raleway", sans-serif; //sans-serif if raleway does not exist
-}
-*/
-.full-height {
-  height: 100%;
 }

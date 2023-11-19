@@ -24,7 +24,8 @@ pub enum Msg {
     ToggleCellule(usize),
     AddState,
     RemoveState,
-    UpdateSize(String, isize),
+    IncrSize,
+    DecrSize,
     Tick, // game update tick
 }
 
@@ -88,7 +89,7 @@ impl App {
             self.current_eval_cell = idx;
 
             let neighbours: String = self
-                .neighbours()
+                 .neighbours()
                 .iter()
                 .map(|c| format!("'{}'", c))
                 .collect::<Vec<String>>()
@@ -181,8 +182,13 @@ impl App {
     //Rendering for HTMl - wasm
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
+        let mut cellule_size = 40.0;
+        // divide 20 by the number of cellules
+        cellule_size = cellule_size / self.cellules_width as f32 ;
+        log::info!("cellule size {}", cellule_size);
+
         html! {
-            <div key={idx} class={classes!("game-cellule", cellule_status)}
+            <div key={idx} class={classes!("cellule", cellule_status)} style={format!("width: {}rem; height: {}rem;", cellule_size, cellule_size)}
                 onclick={link.callback(move |_| Msg::ToggleCellule(idx))}>
             </div>
         }
@@ -198,7 +204,7 @@ impl Component for App {
         let callback = ctx.link().callback(|_| Msg::Tick); //runs a callback for each tick
         let interval = Interval::new(200, move || callback.emit(())); //200ms between each moves -- runs above line
 
-        let (cellules_width, cellules_height) = (60, 40); //grid is 53x40
+        let (cellules_width, cellules_height) = (10, 10); //grid is SQUARE
 
         let logbook = Arc::new(RwLock::new(Vec::<String>::new()));
 
@@ -355,38 +361,27 @@ impl Component for App {
                 true
             }
 
-            Msg::UpdateSize(side, amount) => { // straight up terrible code dont do this
-                if amount < 0 {
-                    if side == "width" && self.cellules_width <= 2 {
-                        return false;
-                    }
-                    if side == "height" && self.cellules_height <= 2 {
-                        return false;
-                    }
-
-                    if side == "width" {
-                        self.cellules_width -= 2;
-                    } else {
-                        self.cellules_height -= 2;
-                    }
-
-                } else {
-                    if side == "width" && self.cellules_width >= 100 {
-                        return false;
-                    }
-                    if side == "height" && self.cellules_height >= 100 {
-                        return false;
-                    }
-
-                    if side == "width" {
-                        self.cellules_width += 2;
-                    } else {
-                        self.cellules_height += 2;
-                    }
+            Msg::IncrSize => {
+                if self.cellules_width > 100 || self.cellules_height > 100 {
+                    log::error!("Cannot increase size");
+                    return false;
                 }
-
+                self.cellules_width += 1;
+                self.cellules_height += 1;
                 self.cellules = vec![Cellule::new('A'); self.cellules_width * self.cellules_height];
-                log::info!("grid new gwidth: {}, gheight: {}", self.cellules_width, self.cellules_height);
+                log::info!("Increased size");
+                true
+            }
+
+            Msg::DecrSize => {
+                if self.cellules_width < 2 || self.cellules_height < 2 {
+                    log::error!("Cannot decrease size");
+                    return false;
+                }
+                self.cellules_width -= 1;
+                self.cellules_height -= 1;
+                self.cellules = vec![Cellule::new('A'); self.cellules_width * self.cellules_height];
+                log::info!("Decreased size");
                 true
             }
         }
@@ -406,8 +401,8 @@ impl Component for App {
                     .iter()
                     .enumerate()
                     .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link())); //map each x to grid
-                html! {
-                    <div key={y} class="game-row">
+                html!{
+                    <div key={y} class="cell-row">
                         { for cells }
                     </div>
                 }
@@ -418,68 +413,56 @@ impl Component for App {
         let available_states = self.cell_states.keys().cloned().collect::<Vec<char>>();
 
         html! {
-            <div>
-            //this will be on the eft side
-                <div class="split game-container">
-                    <header class="app-header">
-                       // <img alt="The app logo" src="favicon.ico" class="app-logo"/>
-                        <h1 class="app-title">{ "Cellular Automata" }</h1>
-                    </header>
-                    <div class="game-area">
-
-                        <div class="game-of-life">
-                            { for cell_rows }
-                        </div>
-
-                        <div class="game-buttons">
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Start)}>{ "Start" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
-                        </div>
-
-                        <div class="game-buttons">
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("width".to_string(), 1))}>{ "width++" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("width".to_string(), -1))}>{ "width--" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("height".to_string(), 1))}>{ "height++" }</button>
-                            <button class="game-button" onclick={ctx.link().callback(|_| Msg::UpdateSize("height".to_string(), -1))}>{ "height--" }</button>
-                        </div>
+            <div class="app">
+                <div class="pane">
+                    <h1>{ "Cellular Automata" }</h1>
+                    <div class="cells">
+                        {for cell_rows}
+                    </div>
+                    <div class="controls">
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::Random)}>{ "Random" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::Step)}>{ "Step" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::Start)}>{ "Start" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::Stop)}>{ "Stop" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::IncrSize)}>{ "Incr" }</button>
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::DecrSize)}>{ "Decr" }</button>
 
                     </div>
                 </div>
-
-                <div class = "split right">
-                    <div class="nav">
-                        <button class="- nav-button" onclick={ctx.link().callback(|_| Msg::RemoveState)}>{"-"}</button>
-                        {
-                            available_states.into_iter().map(|state| {
-                                let class_string = format!("{} nav-button", state);
-                                html!{ <button class={ class_string } onclick={ctx.link().callback(move |_| Msg::SetState(state))}>{ state }</button>}
-                            }).collect::<Html>()
-                        }
-                        <button class="+ nav-button" onclick={ctx.link().callback(|_| Msg::AddState)}>{ "+" }</button>
-                    </div>
-
-
-                    <div class = "txt">
-                        <CodeEditor classes={"full-height"} options={
-                            CodeEditorOptions::default()
-                                .with_language("rust".to_owned())
-                                .with_model(self.cell_states[&self.selected_state].clone())
-                                .with_builtin_theme(BuiltinTheme::VsDark)
-                                .with_automatic_layout(true)
-                                .to_sys_options()
-                        } />
+                <div class="pane">
+                    <div class="editor">
+                        <div class="nav">
+                            <button class="nav-button" onclick={ctx.link().callback(|_| Msg::RemoveState)}>{"-"}</button>
+                            {
+                                available_states.into_iter().map(|state| {
+                                    let mut class_string = format!("{} nav-button", state);
+                                    if state == self.selected_state {
+                                        class_string = format!("{} selected", class_string)
+                                    }
+                                    html!{ <button class={ class_string } onclick={ctx.link().callback(move |_| Msg::SetState(state))}>{ state }</button>}
+                                }).collect::<Html>()
+                            }
+                            <button class="nav-button" onclick={ctx.link().callback(|_| Msg::AddState)}>{ "+" }</button>
+                        </div>
+                        <div class="code-editor">
+                        <CodeEditor classes={"editor-height"} options={
+                                CodeEditorOptions::default()
+                                    .with_language("rust".to_owned())
+                                    .with_model(self.cell_states[&self.selected_state].clone())
+                                    .with_builtin_theme(BuiltinTheme::VsDark)
+                                    .with_automatic_layout(true)
+                                    .to_sys_options()} />
                         <br />
-                    </div>
-                    <div class="log">
-                        <h2>{"Log Book"}</h2>
+                        </div>
+                        <div class="log">
+                        <h1>{"Log"}</h1>
                         <ul>
                         { for self.logbook.read().unwrap().iter().map(|entry| {
                             html! { <li>{ entry }</li> }
                         })}
                         </ul>
+                        </div>
                     </div>
                 </div>
             </div>
