@@ -1,7 +1,7 @@
-mod cell; //importing cell.rs code
+mod cell;
 
 use cell::{Cellule, State};
-use gloo::timers::callback::Interval;
+use gloo::{timers::callback::Interval, storage::{LocalStorage, Storage}};
 use monaco::{
     api::{CodeEditorOptions, TextModel},
     sys::editor::BuiltinTheme,
@@ -24,12 +24,12 @@ pub enum Msg {
     ToggleCellule(usize),
     AddState,
     RemoveState,
+    SaveStates,
     IncrSize,
     DecrSize,
     Tick, // game update tick
 }
 
-//creation of grid
 pub struct App {
     active: bool,                            // is the game running
     selected_state: State, // what state is selected, must be a state in cell_states
@@ -61,9 +61,7 @@ impl App {
     }
 
     pub fn random_mutate(&mut self) {
-        //goes through each pixel in a grid
         for cellule in self.cellules.iter_mut() {
-            // Switch state to a randomly available state in the cell states
             let random_state = self
                 .cell_states
                 .keys()
@@ -80,11 +78,9 @@ impl App {
         }
     }
 
-    //step by step
     fn step(&mut self) {
         let mut new_cellules = self.cellules.clone();
 
-        //goes through each cell
         for (idx, cellule) in self.cellules.iter().enumerate() {
             self.current_eval_cell = idx;
 
@@ -93,10 +89,10 @@ impl App {
                 .iter()
                 .map(|c| format!("'{}'", c))
                 .collect::<Vec<String>>()
-                .join(", ");
+                .join(", "); // create formatting string so that the vector array of neighbours turns into a string of comma seperated values
 
             let script = format!(
-                "let current = {cell_id};\nlet neighbours = [{neighbours}];\n{code}",
+                "let current = {cell_id};\nlet neighbours = [{neighbours}];\n{code}", // code injection of variables cause the script doesnt let me define cool rust functions
                 cell_id = idx,
                 neighbours = neighbours,
                 code = &self.cell_states[&cellule.state].get_value()
@@ -109,8 +105,8 @@ impl App {
                 log.write().unwrap().push(entry);
             });
 
-            let result = self.engine.eval::<char>(&script);
-            // log::info!("{:?}", result);
+            let result = self.engine.eval::<char>(&script); // executes the user script for each cell, could be multithreaded?
+
             match result {
                 Ok(state) => {
                     new_cellules[idx].set_state(state);
@@ -179,13 +175,12 @@ impl App {
             .filter(|&state| state == &filterstate)
             .count()
     }
-    //Rendering for HTMl - wasm
+
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
         let mut cellule_size = 40.0;
-        // divide 20 by the number of cellules
+
         cellule_size = cellule_size / self.cellules_width as f32 ;
-        log::info!("cellule size {}", cellule_size);
 
         html! {
             <div key={idx} class={classes!("cellule", cellule_status)} style={format!("width: {}rem; height: {}rem;", cellule_size, cellule_size)}
@@ -208,7 +203,6 @@ impl Component for App {
 
         let logbook = Arc::new(RwLock::new(Vec::<String>::new()));
 
-        //runs the board as soon as the board is open - makes every cell dead
         Self {
             active: false,       //does not start game
             selected_state: 'B', //default state
@@ -216,23 +210,24 @@ impl Component for App {
             cell_states: BTreeMap::from([
                 (
                     'A',
-                    TextModel::create("return \'B\';", Some("rust"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get('A'.to_string()).unwrap_or_else(|_|{"return \'B\';"}).to_string(), Some("rust"), None).unwrap(),
                 ),
                 (
                     'B',
-                    TextModel::create("return \'C\';", Some("rust"), None).unwrap(),
+                    TextModel::create(LocalStorage::get('B'.to_string()).unwrap_or_else(|_|{"return \'C\';"}), Some("rust"), None).unwrap(),
+
                 ),
                 (
                     'C',
-                    TextModel::create("return \'D\';", Some("rust"), None).unwrap(),
+                    TextModel::create(LocalStorage::get('C'.to_string()).unwrap_or_else(|_|{"return \'D\';"}), Some("rust"), None).unwrap(),
                 ),
                 (
                     'D',
-                    TextModel::create("return \'E\';", Some("rust"), None).unwrap(),
+                    TextModel::create(LocalStorage::get('D'.to_string()).unwrap_or_else(|_|{"return \'E\';"}), Some("rust"), None).unwrap(),
                 ),
                 (
                     'E',
-                    TextModel::create("return \'A\';", Some("rust"), None).unwrap(),
+                    TextModel::create(LocalStorage::get('E'.to_string()).unwrap_or_else(|_|{"return \'A\';"}), Some("rust"), None).unwrap(),
                 ),
             ]), //5 enabled states by default
             cellules_width,
@@ -318,6 +313,13 @@ impl Component for App {
                 }
             }
 
+            Msg::SaveStates => {
+                for (state, model) in self.cell_states.iter() {
+                    LocalStorage::set(state.to_string(), model.get_value());
+                }
+                true
+            }
+
             Msg::AddState => {
                 if self.cell_states.len() >= 16 {
                     log::error!("Too many states");
@@ -331,7 +333,7 @@ impl Component for App {
 
                 self.cell_states.insert(
                     new_state,
-                    TextModel::create("", Some("rust"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("return \'{}\';", (((new_state as u8) + 1) as char))}), Some("rust"), None).unwrap(),
                 );
                 self.selected_state = new_state;
                 true
@@ -357,7 +359,6 @@ impl Component for App {
                 self.cell_states.remove(&last_state);
 
                 log::info!("removed state {}", last_state);
-                log::info!("{:?}", self.cell_states.clone());
                 true
             }
 
@@ -408,8 +409,6 @@ impl Component for App {
                 }
             });
 
-        // sort the cell_states btreemap based on the keys (character smallest to largest a-m)
-
         let available_states = self.cell_states.keys().cloned().collect::<Vec<char>>();
 
         html! {
@@ -427,7 +426,7 @@ impl Component for App {
                         <button class="button" onclick={ctx.link().callback(|_| Msg::Reset)}>{ "Reset" }</button>
                         <button class="button" onclick={ctx.link().callback(|_| Msg::IncrSize)}>{ "Incr" }</button>
                         <button class="button" onclick={ctx.link().callback(|_| Msg::DecrSize)}>{ "Decr" }</button>
-
+                        <button class="button" onclick={ctx.link().callback(|_| Msg::SaveStates)}>{ "Save" }</button>
                     </div>
                 </div>
                 <div class="pane">
