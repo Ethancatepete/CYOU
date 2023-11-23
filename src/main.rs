@@ -92,7 +92,7 @@ impl App {
                 .join(", "); // create formatting string so that the vector array of neighbours turns into a string of comma seperated values
 
             let script = format!(
-                "let current = {cell_id};\nlet neighbours = [{neighbours}];\n{code}", // code injection of variables cause the script doesnt let me define cool rust functions
+                "const CURRENT = {cell_id};\nconst NEIGHBOURS = [{neighbours}];\n fn count_neighbours(a) {{let count = 0; for (state, index) in global::NEIGHBOURS {{if state == a {{ count += 1; }}}} return count; }};\n{code}", // code injection of variables cause the script doesnt let me define cool rust functions
                 cell_id = idx,
                 neighbours = neighbours,
                 code = &self.cell_states[&cellule.state].get_value()
@@ -169,13 +169,7 @@ impl App {
         neighbours
     }
 
-    fn count_neighbours(&self, filterstate: char) -> usize {
-        self.neighbours()
-            .iter()
-            .filter(|&state| state == &filterstate)
-            .count()
-    }
-
+    
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
         let mut cellule_size = 40.0;
@@ -210,26 +204,14 @@ impl Component for App {
             cell_states: BTreeMap::from([
                 (
                     'A',
-                    TextModel::create(&LocalStorage::get('A'.to_string()).unwrap_or_else(|_|{"return \'B\';"}).to_string(), Some("rust"), None).unwrap(),
+                    TextModel::create("//dead \nlet live = count_neighbours('B'); \n\nif live == 3 {\n    return 'B'\n} else {\n    return 'A'}", Some("rust"), None).unwrap(),
                 ),
                 (
                     'B',
-                    TextModel::create(LocalStorage::get('B'.to_string()).unwrap_or_else(|_|{"return \'C\';"}), Some("rust"), None).unwrap(),
+                    TextModel::create("//alive \nlet live = count_neighbours('B'); \n\nif live < 2 || live > 3 {\n    return 'A' \n} else {\n    return 'B'\n} ", Some("rust"), None).unwrap(),
 
                 ),
-                (
-                    'C',
-                    TextModel::create(LocalStorage::get('C'.to_string()).unwrap_or_else(|_|{"return \'D\';"}), Some("rust"), None).unwrap(),
-                ),
-                (
-                    'D',
-                    TextModel::create(LocalStorage::get('D'.to_string()).unwrap_or_else(|_|{"return \'E\';"}), Some("rust"), None).unwrap(),
-                ),
-                (
-                    'E',
-                    TextModel::create(LocalStorage::get('E'.to_string()).unwrap_or_else(|_|{"return \'A\';"}), Some("rust"), None).unwrap(),
-                ),
-            ]), //5 enabled states by default
+                ]), //2 enabled states by default
             cellules_width,
             cellules_height,
             current_eval_cell: 0,
@@ -237,12 +219,12 @@ impl Component for App {
                 let mut engine = Engine::new();
                 engine.register_fn("rand", Self::rand);
                 engine.register_fn("neighbours", Self::neighbours);
-                engine.register_fn("count_neighbours", Self::count_neighbours);
                 engine.register_fn("rand_state", Self::rand_state);
+                engine.set_optimization_level(rhai::OptimizationLevel::Full);
                 engine
             },
             logbook: logbook.clone(),
-            _interval: interval, //tick speed basically
+            _interval: interval,
         }
     }
 
@@ -428,6 +410,9 @@ impl Component for App {
                         <button class="button" onclick={ctx.link().callback(|_| Msg::DecrSize)}>{ "Decr" }</button>
                         <button class="button" onclick={ctx.link().callback(|_| Msg::SaveStates)}>{ "Save" }</button>
                     </div>
+                    <div class="cheatsheet">
+                        <script src="https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843.js"></script>
+                    </div>
                 </div>
                 <div class="pane">
                     <div class="editor">
@@ -455,7 +440,6 @@ impl Component for App {
                         <br />
                         </div>
                         <div class="log">
-                        <h1>{"Log"}</h1>
                         <ul>
                         { for self.logbook.read().unwrap().iter().map(|entry| {
                             html! { <li>{ entry }</li> }
