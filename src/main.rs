@@ -204,12 +204,11 @@ impl Component for App {
             cell_states: BTreeMap::from([
                 (
                     'A',
-                    TextModel::create("//dead \nlet live = count_neighbours('B'); \n\nif live == 3 {\n    return 'B'\n} else {\n    return 'A'}", Some("rust"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("//dead \nlet live = count_neighbours('B'); \n\nif live == 3 {\n    return 'B'\n} else {\n    return 'A'}")}), Some("javascript"), None).unwrap(),
                 ),
                 (
                     'B',
-                    TextModel::create("//alive \nlet live = count_neighbours('B'); \n\nif live < 2 || live > 3 {\n    return 'A' \n} else {\n    return 'B'\n} ", Some("rust"), None).unwrap(),
-
+                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("//alive \nlet live = count_neighbours('B'); \n\nif live < 2 || live > 3 {\n    return 'A' \n} else {\n    return 'B'\n}")}), Some("javascript"), None).unwrap(),
                 ),
                 ]), //2 enabled states by default
             cellules_width,
@@ -297,7 +296,7 @@ impl Component for App {
 
             Msg::SaveStates => {
                 for (state, model) in self.cell_states.iter() {
-                    LocalStorage::set(state.to_string(), model.get_value());
+                    LocalStorage::set(state.to_string(), model.get_value()).unwrap;
                 }
                 true
             }
@@ -315,7 +314,7 @@ impl Component for App {
 
                 self.cell_states.insert(
                     new_state,
-                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("return \'{}\';", (((new_state as u8) + 1) as char))}), Some("rust"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("return \'{}\';", (((new_state as u8) + 1) as char))}), Some("javascript"), None).unwrap(),
                 );
                 self.selected_state = new_state;
                 true
@@ -411,7 +410,12 @@ impl Component for App {
                         <button class="button" onclick={ctx.link().callback(|_| Msg::SaveStates)}>{ "Save" }</button>
                     </div>
                     <div class="cheatsheet">
-                        <script src="https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843.js"></script>
+                        <ul>
+                            <li><a href="https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843">{"Handwritten Cheatsheet"}</a></li>
+                            <li><a href="https://rhai.rs/book/ref/index.html">{"Rhai Book"}</a></li>
+                            <li><a href="https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit#slide=id.g2425ae14124_0_52">{"Session Presentation"}</a></li>
+                        </ul>
+
                     </div>
                 </div>
                 <div class="pane">
@@ -432,7 +436,7 @@ impl Component for App {
                         <div class="code-editor">
                         <CodeEditor classes={"editor-height"} options={
                                 CodeEditorOptions::default()
-                                    .with_language("rust".to_owned())
+                                    .with_language("javascript".to_owned())
                                     .with_model(self.cell_states[&self.selected_state].clone())
                                     .with_builtin_theme(BuiltinTheme::VsDark)
                                     .with_automatic_layout(true)

@@ -43,6 +43,27 @@ h1 {
   text-rendering: optimizeLegibility;
 }
 
+.cheatsheet {
+  font-size: 30px;
+  padding: 10px;
+  font-family: "Lexend", sans-serif;
+  font-weight: 200;
+  line-height: 1.6em;
+}
+
+a {
+  color: #F1F2F3;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #04AA6D;
+}
+
+a:visted {
+  color: #F1F2F3;
+}
+
 ul {
   list-style-type: none;
   margin: 0;
@@ -106,9 +127,10 @@ h2 {
 
 .button {
   background-color: #f1f1f1;
-  border: none;
+  border: 2px solid #111111;
   height: 50px;
-  width: 95%;
+  width: 100%;
+  padding: 5px;
   font-size: 20px;
 }
 
