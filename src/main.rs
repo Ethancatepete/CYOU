@@ -172,7 +172,7 @@ impl App {
     
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
-        let mut cellule_size = 30.0;
+        let mut cellule_size = 20.0;
 
         cellule_size = cellule_size / self.cellules_width as f32 ;
 
