@@ -204,11 +204,13 @@ impl Component for App {
             cell_states: BTreeMap::from([
                 (
                     'A',
-                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("//dead \nlet live = count_neighbours('B'); \n\nif live == 3 {\n    return 'B'\n} else {\n    return 'A'}")}), Some("javascript"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get("A").unwrap_or_else(|_|{format!("//dead \nlet live = count_neighbours('B'); \n\nif live == 3 {{\n    return 'B'\n}} else {{\n    return 'A'\n}}")}), Some("javascript"), None).unwrap(),
                 ),
                 (
                     'B',
-                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("//alive \nlet live = count_neighbours('B'); \n\nif live < 2 || live > 3 {\n    return 'A' \n} else {\n    return 'B'\n}")}), Some("javascript"), None).unwrap(),
+                    TextModel::create(&LocalStorage::get("B").unwrap_or_else(|_|{format!("//alive \nlet live = count_neighbours('B'); \n\nif live < 2 || live > 3 {{\n    return 'A' \n}} else {{\n    return 'B'\n}}")}), Some("javascript"), None).unwrap(),
+
+
                 ),
                 ]), //2 enabled states by default
             cellules_width,
@@ -296,7 +298,7 @@ impl Component for App {
 
             Msg::SaveStates => {
                 for (state, model) in self.cell_states.iter() {
-                    LocalStorage::set(state.to_string(), model.get_value()).unwrap;
+                    LocalStorage::set(state.to_string(), model.get_value()).unwrap();
                 }
                 true
             }
