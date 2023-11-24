@@ -38,6 +38,7 @@ pub struct App {
     cellules_width: usize,
     cellules_height: usize,
     current_eval_cell: usize, //current cell being evaluated
+    steps: usize,
     engine: Engine,
     logbook: Arc<RwLock<Vec<String>>>,
     _interval: Interval,
@@ -73,12 +74,14 @@ impl App {
 
     //makes all the pixels white - removes the cells
     fn reset(&mut self) {
+        self.steps = 0;
         for cellule in self.cellules.iter_mut() {
             cellule.set_blank();
         }
     }
 
     fn step(&mut self) {
+        self.steps += 1;
         let mut new_cellules = self.cellules.clone();
 
         for (idx, cellule) in self.cellules.iter().enumerate() {
