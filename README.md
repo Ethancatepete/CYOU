@@ -1,12 +1,15 @@
-# Cellular Automata
-A scriptable web automata simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
+# Cyou
+
+_Code your own universe_
+
+A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
 
 This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
 
 ## Introduction
-In addition to this software, there is a google slideshow introducing the concept [here](https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing) or a pdf if you prefer that.
+In addition to this software, there is a google slideshow introducing the concept [here](https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing) or a [pdf](https://github.com/Ethancatepete/Cellular-Automata/blob/main/Cellular%20Automata.pdf) if thats easier.
 
-## Gallery
+You can also checkout this informal [cheatsheet](https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843)
 
 ## Installation
 
