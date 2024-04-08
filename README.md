@@ -2,7 +2,7 @@
 
 ✨ _Code Your Own Universe_ ✨
 
-![Static Badge](https://img.shields.io/badge/0.1.0-black?label=CYEW%20Version&color=%2300FF00)
+![Static Badge](https://img.shields.io/badge/0.1.0-black?label=CYEW%20version&labelColor=green)
 
 A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [Rhai.script](https://rhai.rs/).
 
