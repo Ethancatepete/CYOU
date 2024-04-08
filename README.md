@@ -12,7 +12,7 @@ A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/
 This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
 
 ## Introduction
-In addition to this software, there is some materials which are listed below:
+In addition to this software, helpful materials can be found below:
 
 <h4>
     <a href="https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing"> Google slides </a>
