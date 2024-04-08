@@ -4,18 +4,9 @@
 
 A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [Rhai.script](https://rhai.rs/).
 
-<div align = "center"> 
+<div style="text-align: center;"> 
   <a href="https://yew.rs/" target="_blank"><img src="https://yew.rs/img/logo.png" width="150" /></a> 
   <a href="https://rhai.rs" target="_blank"><img src="https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.svg" width="600" /></a> 
-</div>
-
-<div style="display: flex; justify-content: center;">
-  <div>
-    <a href="https://yew.rs/" target="_blank"><img src="https://yew.rs/img/logo.png" width="150" /></a>
-  </div>
-  <div>
-    <a href="https://rhai.rs" target="_blank"><img src="https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.svg" width="600" /></a>
-  </div>
 </div>
 
 This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
