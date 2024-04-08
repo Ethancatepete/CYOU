@@ -4,9 +4,9 @@
 
 A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
 
-<div align="center left">
+<div align="center">
   <a href="https://yew.rs/" target="_blank"><img src="https://yew.rs/img/logo.png" width="150" /></a>
-
+  <a href="https://rhai.rs" target="_blank"><img src="https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.svg" width="150" /></a>
 </div>
 
 ![Yew image](image URL)
