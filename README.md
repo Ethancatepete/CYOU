@@ -14,7 +14,7 @@ This software was developed as an interactive playground for the hackathon lectu
 ## Introduction
 In addition to this software, there is some materials which are listed below:
 
-<h4 align = "center">
+<h4>
     <a href="https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing"> Google slides </a>
     <span> | </span>
     <a href="https://github.com/Ethancatepete/Cellular-Automata/blob/main/Cellular%20Automata.pdf"> PDF introduction</a>
