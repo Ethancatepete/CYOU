@@ -2,22 +2,26 @@
 
 ✨ _Code Your Own Universe_ ✨
 
-A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
+A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [Rhai.script](https://rhai.rs/).
 
 <div align="center">
   <a href="https://yew.rs/" target="_blank"><img src="https://yew.rs/img/logo.png" width="150" /></a>
   <a href="https://rhai.rs" target="_blank"><img src="https://rhai.rs/book/images/logo/rhai-banner-transparent-colour.svg" width="600" /></a>
 </div>
 
-![Yew image](image URL)
-![Rhai script](image URL)
-
 This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
 
 ## Introduction
 In addition to this software, there is a google slideshow introducing the concept [here](https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing) or a [pdf](https://github.com/Ethancatepete/Cellular-Automata/blob/main/Cellular%20Automata.pdf) if thats easier.
 
-You can also checkout this informal [cheatsheet](https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843)
+<h4>
+    <a href="https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing"> Google slides </a>
+    <span> | </span>
+    <a href="https://github.com/Ethancatepete/Cellular-Automata/blob/main/Cellular%20Automata.pdf"> PDF introduction</a>
+    <a href="https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843">Cheat Sheet</a>
+    
+  </h4>
+</div>
 
 ## Installation
 
