@@ -1,8 +1,16 @@
-# Cyou
+# CYOU
 
-_Code your own universe_
+✨ _Code Your Own Universe_ ✨
 
 A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
+
+<div align="center left">
+  <a href="https://yew.rs/" target="_blank"><img src="https://yew.rs/img/logo.png" width="150" /></a>
+
+</div>
+
+![Yew image](image URL)
+![Rhai script](image URL)
 
 This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
 
