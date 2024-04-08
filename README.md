@@ -1,4 +1,14 @@
-### Installation
+# Cellular Automata
+A scriptable web automata simulator made with the [Yew](https://yew.rs/) framework and scriptable through [rhai.script](https://rhai.rs/).
+
+This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
+
+## Introduction
+In addition to this software, there is a google slideshow introducing the concept [here](https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing) or a pdf if you prefer that.
+
+## Gallery
+
+## Installation
 
 If you don't already have it installed, it's time to install Rust: <https://www.rust-lang.org/tools/install>.
 The rest of this guide assumes a typical Rust installation which contains both `rustup` and Cargo.
