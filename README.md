@@ -1,4 +1,26 @@
-### Installation
+# CYOU
+
+✨ _Code Your Own Universe_ ✨
+
+![Static Badge](https://img.shields.io/badge/0.1.0-black?label=CYEW%20version&labelColor=green)
+
+A scriptable cellular automata web simulator made with the [Yew](https://yew.rs/) framework and scriptable through [Rhai.script](https://rhai.rs/).
+
+This software was developed as an interactive playground for the hackathon lecture on Cellular Automata: a crash course into discrete computational modelling at ESF CoCo 2023. 
+
+## Introduction
+In addition to this software, helpful materials can be found below:
+
+<h4>
+    <a href="https://docs.google.com/presentation/d/1Y31du8gcAD8kWrL_U6nRaYtU3mEgcX4UPUYnpPxJFbE/edit?usp=sharing"> Google slides </a>
+    <span> | </span>
+    <a href="https://github.com/Ethancatepete/Cellular-Automata/blob/main/Cellular%20Automata.pdf"> PDF introduction</a>
+    <span> | </span>
+    <a href="https://gist.github.com/wylited/b8d605326cf30fd54b34f9576378b843">Cheat Sheet</a>   
+  </h4>
+</div>
+
+## Installation
 
 If you don't already have it installed, it's time to install Rust: <https://www.rust-lang.org/tools/install>.
 The rest of this guide assumes a typical Rust installation which contains both `rustup` and Cargo.
