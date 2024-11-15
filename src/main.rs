@@ -1,7 +1,10 @@
 mod cell;
 
 use cell::{Cellule, State};
-use gloo::{timers::callback::Interval, storage::{LocalStorage, Storage}};
+use gloo::{
+    storage::{LocalStorage, Storage},
+    timers::callback::Interval,
+};
 use monaco::{
     api::{CodeEditorOptions, TextModel},
     sys::editor::BuiltinTheme,
@@ -88,7 +91,7 @@ impl App {
             self.current_eval_cell = idx;
 
             let neighbours: String = self
-                 .neighbours()
+                .neighbours()
                 .iter()
                 .map(|c| format!("'{}'", c))
                 .collect::<Vec<String>>()
@@ -172,12 +175,11 @@ impl App {
         neighbours
     }
 
-    
     fn view_cellule(&self, idx: usize, cellule: &Cellule, link: &Scope<Self>) -> Html {
         let cellule_status: String = cellule.state.to_string();
         let mut cellule_size = 20.0;
 
-        cellule_size = cellule_size / self.cellules_width as f32 ;
+        cellule_size = cellule_size / self.cellules_width as f32;
 
         html! {
             <div key={idx} class={classes!("cellule", cellule_status)} style={format!("width: {}rem; height: {}rem;", cellule_size, cellule_size)}
@@ -196,7 +198,7 @@ impl Component for App {
         let callback = ctx.link().callback(|_| Msg::Tick); //runs a callback for each tick
         let interval = Interval::new(200, move || callback.emit(())); //200ms between each moves -- runs above line
 
-        let (cellules_width, cellules_height) = (10, 10); //grid is SQUARE
+        let (cellules_width, cellules_height) = (10, 10);
 
         let logbook = Arc::new(RwLock::new(Vec::<String>::new()));
 
@@ -319,7 +321,14 @@ impl Component for App {
 
                 self.cell_states.insert(
                     new_state,
-                    TextModel::create(&LocalStorage::get(new_state.to_string()).unwrap_or_else(|_|{format!("return \'{}\';", (((new_state as u8) + 1) as char))}), Some("javascript"), None).unwrap(),
+                    TextModel::create(
+                        &LocalStorage::get(new_state.to_string()).unwrap_or_else(|_| {
+                            format!("return \'{}\';", (((new_state as u8) + 1) as char))
+                        }),
+                        Some("javascript"),
+                        None,
+                    )
+                    .unwrap(),
                 );
                 self.selected_state = new_state;
                 true
@@ -388,7 +397,7 @@ impl Component for App {
                     .iter()
                     .enumerate()
                     .map(|(x, cell)| self.view_cellule(idx_offset + x, cell, ctx.link())); //map each x to grid
-                html!{
+                html! {
                     <div key={y} class="cell-row">
                         { for cells }
                     </div>
